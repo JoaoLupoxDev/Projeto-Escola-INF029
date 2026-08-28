@@ -2,7 +2,7 @@
 #define SRTUCT_DISCIPLINA_H
 #define MAX_DISCIPLINAS 100
 #include <StructProfessor.h>
-
+#include <StructAluno.h>
 typedef struct{
     char NomeDisciplina[50];
     long CodigoDisciplina;
