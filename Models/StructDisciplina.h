@@ -7,7 +7,7 @@ typedef struct{
     char NomeDisciplina[50];
     long CodigoDisciplina;
     char SemestreDisciplina;
-    Professor ProfessorDisciplina;
+    Professor ProfessorDisciplina; 
 }Disciplina;
 
 typedef struct{

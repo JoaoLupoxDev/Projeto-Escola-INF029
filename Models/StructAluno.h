@@ -6,7 +6,7 @@ typedef struct
 {
     long MatriculaAluno;
     char NomeAluno[50];
-    char SexoAluno;
+    char SexoAluno[1]; //pega apenas M ou F
     char DataNascimentoAluno[11];   
     char CPFaluno[15];
 }Aluno;
@@ -15,5 +15,8 @@ typedef struct{
     Aluno listaDeAlunos[MAX_ALUNOS];
     int quantidadeTotal;
 }ListaAlunos;
+
+extern ListaAlunos listaGlobalAlunos[];
+extern int indiceListaAlunos=0;
 
 #endif

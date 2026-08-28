@@ -15,4 +15,7 @@ typedef struct{
     int quantidadeProfessores;
 }ListaProfessores;
 
+extern ListaProfessores listaGlobalProfessores[];
+extern int indiceListaProfessores=0;
+
 #endif
