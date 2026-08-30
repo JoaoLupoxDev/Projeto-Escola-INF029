@@ -1,6 +1,5 @@
-#include "StructAluno.h"
+#include "StructPessoa.h"
 #include "StructDisciplina.h"
-#include "StructProfessor.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
