@@ -9,6 +9,8 @@
 
 int indiceListaPessoas=0;//variavel global para adicionar professores e alunos sempre em indices diferentes (evita substituição de professores)
 ListaPessoas listaGlobalPessoas;
+int indiceListaDisciplinas=0;//variavel global para adicionar disciplinas sempre em indices diferentes (evita substituição de disciplinas)
+ListaDisciplinas listaGlobalDisciplinas;
 
 
 void CadastrarAluno(){
@@ -80,6 +82,35 @@ void CadastrarAluno(){
     indiceListaPessoas++;
 }
 
+void excluirPessoa(long matricula, char tipo){
+    for (int i = 0; i < indiceListaPessoas; i++){
+        if (matricula == listaGlobalPessoas.listaDePessoas[i].Matricula && tipo == listaGlobalPessoas.listaDePessoas[i].Tipo){
+            // Move os elementos posteriores uma posição para trás
+            for (int j = i; j < indiceListaPessoas - 1; j++){
+                listaGlobalPessoas.listaDePessoas[j] = listaGlobalPessoas.listaDePessoas[j+1];
+            }
+            indiceListaPessoas--; // Reduz a contagem de pessoas
+            break; 
+        }
+    }
+}
+
+void atualizarPessoa(long matricula, char tipo){ //falta verificar a data de nascimento se está correta
+    for (int i = 0; i < indiceListaPessoas; i++){
+        if (matricula == listaGlobalPessoas.listaDePessoas[i].Matricula && tipo == listaGlobalPessoas.listaDePessoas[i].Tipo){
+            printf("Digite o novo nome: ");
+            fgets(listaGlobalPessoas.listaDePessoas[i].Nome, lenTexto(listaGlobalPessoas.listaDePessoas[i].Nome), stdin);
+            printf("Digite o novo CPF: ");
+            fgets(listaGlobalPessoas.listaDePessoas[i].CPF, lenTexto(listaGlobalPessoas.listaDePessoas[i].CPF), stdin);
+            printf("Digite o novo sexo: ");
+            fgets(listaGlobalPessoas.listaDePessoas[i].Sexo, lenTexto(listaGlobalPessoas.listaDePessoas[i].Sexo), stdin);
+            printf("Digite a nova data de nascimento: "); //verificar a data de nascimento aqui!!!
+            fgets(listaGlobalPessoas.listaDePessoas[i].DataNascimento, lenTexto(listaGlobalPessoas.listaDePessoas[i].DataNascimento), stdin);
+            break;
+        }
+    }
+}
+
 int verificaCPF(char cpf[]){ //verifica se há este cpf na lista de pessoas
     int validador=1;
     for (int i=0;i<indiceListaPessoas;i++){
@@ -90,7 +121,7 @@ int verificaCPF(char cpf[]){ //verifica se há este cpf na lista de pessoas
     }
     return validador;
 }
-int verificaMatricula(int matricula){ //verifica se há esta matricula na lista de pessoas
+int verificaMatricula(long matricula){ //verifica se há esta matricula na lista de pessoas
     int validador=1;
     for (int i=0;i<indiceListaPessoas;i++){
         if (matricula == listaGlobalPessoas.listaDePessoas[i].Matricula){
@@ -107,22 +138,44 @@ void paraMaiuscula(char *str){
     }
 }
 
-void listarPessoas(){
-    for (int i=0;i<indiceListaPessoas;i++){
-        printf("Nome:%s Matricula:%ld Sexo:%c DataNascimento:%s \n",listaGlobalPessoas.listaDePessoas[i].Nome, listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].Sexo, listaGlobalPessoas.listaDePessoas[i].DataNascimento);
-    }
-}
-
-void listarPessoasPorSexo(char sexo){
-    if (sexo == 'M'){
+void listarPessoas(char tipo){
+    if (tipo == 'A'){
         for (int i=0;i<indiceListaPessoas;i++){
-            if (listaGlobalPessoas.listaDePessoas[i].Sexo == 'M'){
+            if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A'){
                 printf("Nome:%s Matricula:%ld Sexo:%c DataNascimento:%s \n",listaGlobalPessoas.listaDePessoas[i].Nome, listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].Sexo, listaGlobalPessoas.listaDePessoas[i].DataNascimento);
-            }
+            }            
         }
     }else{
         for (int i=0;i<indiceListaPessoas;i++){
-            if (listaGlobalPessoas.listaDePessoas[i].Sexo == 'F'){
+            if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'P'){
+                printf("Nome:%s Matricula:%ld Sexo:%c DataNascimento:%s \n",listaGlobalPessoas.listaDePessoas[i].Nome, listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].Sexo, listaGlobalPessoas.listaDePessoas[i].DataNascimento);
+            }              
+        }
+    }   
+}
+
+void listarPessoasPorSexo(char sexo, char tipo){
+    if (sexo == 'M' && tipo == 'A'){
+        for (int i=0;i<indiceListaPessoas;i++){
+            if (listaGlobalPessoas.listaDePessoas[i].Sexo == 'M' && listaGlobalPessoas.listaDePessoas[i].Tipo == 'A'){
+                printf("Nome:%s Matricula:%ld Sexo:%c DataNascimento:%s \n",listaGlobalPessoas.listaDePessoas[i].Nome, listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].Sexo, listaGlobalPessoas.listaDePessoas[i].DataNascimento);
+            }
+        }
+    }else if (sexo == 'F' && tipo == 'A'){
+        for (int i=0;i<indiceListaPessoas;i++){
+            if (listaGlobalPessoas.listaDePessoas[i].Sexo == 'F' && listaGlobalPessoas.listaDePessoas[i].Tipo == 'A'){
+                printf("Nome:%s Matricula:%ld Sexo:%c DataNascimento:%s \n",listaGlobalPessoas.listaDePessoas[i].Nome, listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].Sexo, listaGlobalPessoas.listaDePessoas[i].DataNascimento);
+            }
+        }
+    }else if (sexo == 'M' && tipo == 'P'){
+        for (int i=0;i<indiceListaPessoas;i++){
+            if (listaGlobalPessoas.listaDePessoas[i].Sexo == 'M' && listaGlobalPessoas.listaDePessoas[i].Tipo == 'P'){
+                printf("Nome:%s Matricula:%ld Sexo:%c DataNascimento:%s \n",listaGlobalPessoas.listaDePessoas[i].Nome, listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].Sexo, listaGlobalPessoas.listaDePessoas[i].DataNascimento);
+            }
+        }
+    }else if (sexo == 'F' && tipo == 'P'){
+        for (int i=0;i<indiceListaPessoas;i++){
+            if (listaGlobalPessoas.listaDePessoas[i].Sexo == 'F' && listaGlobalPessoas.listaDePessoas[i].Tipo == 'P'){
                 printf("Nome:%s Matricula:%ld Sexo:%c DataNascimento:%s \n",listaGlobalPessoas.listaDePessoas[i].Nome, listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].Sexo, listaGlobalPessoas.listaDePessoas[i].DataNascimento);
             }
         }
@@ -137,8 +190,35 @@ int lenTexto(char texto[]){ //funcao que retorna o tamanho de um texto
     return i;
 }
 
-void verificaData(char data[]){
 
+int verificaData(char data[]){ //verifica se o molde escrito da data esta correto e se a data escrita é valida (dd/mm/aaaa) 
+    int validador=1; //falta verificar se o ano é bissexto
+    int contadorBarra=0;
+    int contadorNum=0;
+    if (len0Texto(data) != 10){
+        validador=0;
+        return validador;
+    }
+    if (data[2] != '/' || data[5] != '/'){
+        validador=0;
+        return validador;
+    }
+    if (data[0] > '3' || data[0] < '0'){
+        validador=0;
+        return validador;
+    }
+    if (data[1] < '0' || data[1] > '9'){
+        validador=0;
+        return validador;
+    }
+    if (data[0] == '3' && data[1] > '1'){
+        validador=0;
+        return validador;
+    }
+    if (data[0] == '0' && data[1] == '0'){
+        validador=0;
+        return validador;
+    }
 }
 void listarAlunosPorNome(){
 
