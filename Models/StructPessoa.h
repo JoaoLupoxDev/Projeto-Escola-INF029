@@ -6,10 +6,10 @@ typedef struct
 {
     long Matricula;
     char Nome[50];
-    char Sexo[2]; //pega apenas M ou F
+    char Sexo; //pega apenas M ou F
     char DataNascimento[11];   
     char CPF[15];
-    char Tipo[2];
+    char Tipo;
 }Pessoa;
 
 typedef struct{
