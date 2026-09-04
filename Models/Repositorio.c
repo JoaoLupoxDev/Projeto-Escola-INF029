@@ -145,18 +145,19 @@ void menu(void) {
                         listarPessoasPorSexo(sexo, 'A');
                         break;
                     case 6:
-                        listarPessoasPorNome('A');
+                        listarPessoasPorNome('A'); //esta incompleto
                         break;
                     case 7:
                         // falta implementar
                         break;
                     case 8:
+                        
+                        break;
+                    case 9:
                         printf("Digite um texto para buscar alunos com base no texto: ");
                         getchar(); // limpa buffer antes de ler string
                         fgets(texto, sizeof(texto), stdin);
-                        listarPessoasPorString('A', texto);
-                        break;
-                    case 9:
+                        listarPessoasPorString('A', texto);         
                         break;
                     case 0:
                         printf("Saindo do Modulo Aluno\n");
@@ -206,7 +207,6 @@ void menu(void) {
                         break;
                     case 8:
                         printf("Digite um texto para buscar professores com base no texto: ");
-                        getchar();
                         fgets(texto, sizeof(texto), stdin);
                         listarPessoasPorString('P', texto);
                         break;
@@ -225,6 +225,7 @@ void menu(void) {
                 printf("2 - Listar uma disciplina e seus alunos matriculados\n");
                 printf("3 - Listar disciplinas que passam de 40 alunos matriculados\n");
                 printf("4 - Inserir/Excluir alunos de uma disciplina\n");
+                printf("0 - Sair do Modulo Disciplinas");
                 scanf("%d", &escolhaModulo);
                 switch (escolhaModulo) {
                     case 1:
@@ -371,13 +372,31 @@ void listarPessoasPorSexo(char sexo, char tipo) {
 
 void listarPessoasPorNome(char tipo) {
     (void)tipo;
-    // TODO: Implementar busca por nome
 }
 
 void listarPessoasPorString(char tipo, char string[]) {
-    (void)tipo;
-    (void)string;
-    // TODO: Implementar busca por substring
+    int contador=0;
+    for(int i=0;i<indiceListaPessoas;i++){ //for para navegar nos nomes da lista
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo){
+            for (int c=0;c<lenTexto(listaGlobalPessoas.listaDePessoas[i].Nome);c++){ //for para navegar nas letras do nome
+                for (int x=0;x<lenTexto(string);x++){ //for para navegar nas letras da string de busca
+                    if (listaGlobalPessoas.listaDePessoas[i].Nome[c] == string[x]){
+                        contador++;
+                        c++;
+                        for (int y=0;y<lenTexto(string);y++){
+                            if (string[y] == listaGlobalPessoas.listaDePessoas[i].Nome[c]){
+                                string[y] = '/';
+                            }
+                        }
+                    }
+                }
+            }
+            if(contador>=lenTexto(string)){
+                printf("Nome: %s\n",listaGlobalPessoas.listaDePessoas[i].Nome);
+                contador=0;
+            }
+        }
+    }
 }
 
 #endif
