@@ -31,6 +31,8 @@ void listarPessoas(char tipo);
 void listarPessoasPorSexo(char sexo, char tipo);
 void listarPessoasPorNome(char tipo);
 void listarPessoasPorString(char tipo, char string[]);
+void cadastrarDisciplina(void);
+int verificarProfessordisciplina(char professor[]);
 
 // --- FUNÇÕES UTILITÁRIAS ---
 
@@ -221,14 +223,15 @@ void menu(void) {
                 
             case 3:
                 printf("-----MODULO DISCIPLINAS-----\n");
-                printf("1 - Listar todas as disciplinas\n");
+                printf("1 - Cadastrar disciplina\n");
                 printf("2 - Listar uma disciplina e seus alunos matriculados\n");
                 printf("3 - Listar disciplinas que passam de 40 alunos matriculados\n");
                 printf("4 - Inserir/Excluir alunos de uma disciplina\n");
                 printf("0 - Sair do Modulo Disciplinas");
                 scanf("%d", &escolhaModulo);
                 switch (escolhaModulo) {
-                    case 1:
+                    case 1: void cadastrarDisciplina(void);
+                        break;
                     case 2:
                     case 3:
                     case 4:
@@ -423,7 +426,44 @@ void listarDisciplinaEspecifica(char disciplina){
         }
     }
 }
+int verificarProfessordisciplina(char professor[]){
+    for(int i=0;i<indiceListaDisciplinas;i++){
+        if(listaGlobalPessoas.listaDePessoas[i].Tipo=='P'){
+            if(strcmp(listaGlobalPessoas.listaDePessoas[i].Nome,professor)==0){
+                return 1;
+            }
+        }
 
+      }
+      return 0;
+    }
+void cadastrarDisciplina(void){
+    Disciplina disciplina;
+     printf("Digite o nome da disciplina:\n ");
+    getchar(); // Limpa o buffer do scanf anterior  
+    fgets(disciplina.NomeDisciplina,sizeof(disciplina.NomeDisciplina),stdin);
+
+     printf("Digite o codigo da disciplina:\n ");
+    getchar();
+    scanf("%ld",&disciplina.CodigoDisciplina);
+
+     printf("Digite o semestre da disciplina:\n");
+    getchar();
+    fgets(disciplina.SemestreDisciplina,sizeof(disciplina.SemestreDisciplina),stdin);
+
+     printf("Atribua um professor a disciplina:\n)"):
+    getchar();
+    fgets(disciplina.ProfessorDisciplina,sizeof(disciplina.ProfessorDisciplina),stdin);
+      while(verificarProfessordisciplina(disciplina.ProfessorDisciplina)==0){
+        printf("Professor não encontrado ou cadastrado, Digite um professor válido:\n");
+         getchar();
+          fgets(disciplina.ProfessorDisciplina,sizeof(disciplina.ProfessorDisciplina),stdin);
+      }
+      listaDisciplinas[indiceListaDisciplinas] = disciplina;
+    indiceListaDisciplinas++;
+    printf("Disciplina %s cadastrada com sucesso!\n", disciplina.NomeDisciplina);
+
+}
 
 
 #endif
