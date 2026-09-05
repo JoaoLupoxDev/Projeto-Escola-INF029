@@ -13,7 +13,7 @@ ListaPessoas listaGlobalPessoas;
 int quantidadeAlunos = 0;
 int quantidadeProfessores = 0;
 int indiceListaDisciplinas = 0;
-ListaDisciplinas listaGlobalDisciplinas;
+Disciplina listaDisciplinas[MAX_DISCIPLINAS];
 
 // --- PROTÓTIPOS DE TODAS AS FUNÇÕES ---
 int lenTexto(char texto[]);
@@ -398,5 +398,32 @@ void listarPessoasPorString(char tipo, char string[]) {
         }
     }
 }
+
+void listarDisciplinas(void){
+    for (int i=0;i<indiceListaDisciplinas;i++){
+        printf("Nome: %s Codigo: %ld\n  Semestre: %s Professor: %s\n",
+            listaDisciplinas[i].NomeDisciplina,
+            listaDisciplinas[i].CodigoDisciplina, 
+            listaDisciplinas[i].SemestreDisciplina, 
+            listaDisciplinas[i].ProfessorDisciplina);
+    }
+}
+
+void listarDisciplinaEspecifica(char disciplina){
+    for (int i=0;i<indiceListaDisciplinas;i++){
+        if (listaDisciplinas[i].NomeDisciplina == disciplina){
+            printf("Nome: %s Codigo: %ld Semestre: %s Professor: %s\n",
+                listaDisciplinas[i].NomeDisciplina,
+                listaDisciplinas[i].CodigoDisciplina,
+                listaDisciplinas[i].SemestreDisciplina,
+                listaDisciplinas[i].ProfessorDisciplina);
+                for (int j=0;j<10;j++){ //falta navegar nos alunos da respectiva disciplina para printar todos
+                    
+                }       
+        }
+    }
+}
+
+
 
 #endif

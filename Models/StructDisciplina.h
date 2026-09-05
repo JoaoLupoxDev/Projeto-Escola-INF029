@@ -7,12 +7,8 @@ typedef struct{
     char NomeDisciplina[50];
     long CodigoDisciplina;
     char SemestreDisciplina;
-    Pessoa ProfessorDisciplina; 
+    Pessoa ProfessorDisciplina;
 }Disciplina;
 
-typedef struct{
-    Disciplina listaDeDisciplinas[MAX_DISCIPLINAS];
-    int quantidadeDisciplinas;
-}ListaDisciplinas;
 
 #endif

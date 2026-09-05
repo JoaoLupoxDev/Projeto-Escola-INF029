@@ -2,8 +2,7 @@
 #define STRUCT_PESSOA_H
 #define MAX_PESSOAS 100
 
-typedef struct
-{
+typedef struct{
     long Matricula;
     char Nome[50];
     char Sexo; //pega apenas M ou F
