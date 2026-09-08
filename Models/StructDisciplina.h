@@ -6,7 +6,7 @@
 typedef struct{
     char NomeDisciplina[50];
     long CodigoDisciplina;
-    char SemestreDisciplina;
+    char SemestreDisciplina[6];
     Pessoa ProfessorDisciplina;
 }Disciplina;
 

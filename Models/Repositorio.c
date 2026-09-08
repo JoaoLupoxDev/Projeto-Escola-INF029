@@ -408,24 +408,27 @@ void listarDisciplinas(void){
             listaDisciplinas[i].NomeDisciplina,
             listaDisciplinas[i].CodigoDisciplina, 
             listaDisciplinas[i].SemestreDisciplina, 
-            listaDisciplinas[i].ProfessorDisciplina);
+            listaDisciplinas[i].ProfessorDisciplina.Nome);
     }
 }
 
-void listarDisciplinaEspecifica(char disciplina){
-    for (int i=0;i<indiceListaDisciplinas;i++){
-        if (listaDisciplinas[i].NomeDisciplina == disciplina){
+void listarDisciplinaEspecifica(char disciplina[]) {
+    for (int i = 0; i < indiceListaDisciplinas; i++){
+        if (strcmp(listaDisciplinas[i].NomeDisciplina, disciplina) == 0) {
             printf("Nome: %s Codigo: %ld Semestre: %s Professor: %s\n",
                 listaDisciplinas[i].NomeDisciplina,
                 listaDisciplinas[i].CodigoDisciplina,
                 listaDisciplinas[i].SemestreDisciplina,
-                listaDisciplinas[i].ProfessorDisciplina);
-                for (int j=0;j<10;j++){ //falta navegar nos alunos da respectiva disciplina para printar todos
-                    
-                }       
+                listaDisciplinas[i].ProfessorDisciplina.Nome); // Acessa a propriedade .Nome da struct
+
+            for (int j = 0; j < 10; j++) { 
+                // navegação nos alunos
+            }
+            return;
         }
     }
 }
+
 int verificarProfessordisciplina(char professor[]){
     for(int i=0;i<indiceListaDisciplinas;i++){
         if(listaGlobalPessoas.listaDePessoas[i].Tipo=='P'){
@@ -439,27 +442,27 @@ int verificarProfessordisciplina(char professor[]){
     }
 void cadastrarDisciplina(void){
     Disciplina disciplina;
-     printf("Digite o nome da disciplina:\n ");
+    printf("Digite o nome da disciplina:\n ");
     getchar(); // Limpa o buffer do scanf anterior  
     fgets(disciplina.NomeDisciplina,sizeof(disciplina.NomeDisciplina),stdin);
 
-     printf("Digite o codigo da disciplina:\n ");
+    printf("Digite o codigo da disciplina:\n ");
     getchar();
     scanf("%ld",&disciplina.CodigoDisciplina);
 
-     printf("Digite o semestre da disciplina:\n");
+    printf("Digite o semestre da disciplina:\n");
     getchar();
     fgets(disciplina.SemestreDisciplina,sizeof(disciplina.SemestreDisciplina),stdin);
 
-     printf("Atribua um professor a disciplina:\n)"):
+    printf("Atribua um professor a disciplina:\n)");
     getchar();
-    fgets(disciplina.ProfessorDisciplina,sizeof(disciplina.ProfessorDisciplina),stdin);
-      while(verificarProfessordisciplina(disciplina.ProfessorDisciplina)==0){
+    fgets(disciplina.ProfessorDisciplina.Nome, sizeof(disciplina.ProfessorDisciplina.Nome), stdin);
+    while(verificarProfessordisciplina(disciplina.ProfessorDisciplina.Nome)==0){
         printf("Professor não encontrado ou cadastrado, Digite um professor válido:\n");
-         getchar();
-          fgets(disciplina.ProfessorDisciplina,sizeof(disciplina.ProfessorDisciplina),stdin);
-      }
-      listaDisciplinas[indiceListaDisciplinas] = disciplina;
+        getchar();
+        fgets(disciplina.ProfessorDisciplina.Nome, sizeof(disciplina.ProfessorDisciplina.Nome),stdin);
+    }
+    listaDisciplinas[indiceListaDisciplinas] = disciplina;
     indiceListaDisciplinas++;
     printf("Disciplina %s cadastrada com sucesso!\n", disciplina.NomeDisciplina);
 
