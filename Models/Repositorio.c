@@ -260,8 +260,9 @@ void menu(void) {
 
 void voltarAoMenu(void) {
     printf("\nPressione ENTER para voltar ao menu...");
-    getchar(); 
-    getchar(); 
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa qualquer coisa no buffer
+    getchar(); // Espera a tecla enter
 }
 
 void cadastrarPessoa(char tipo) {
@@ -524,6 +525,7 @@ void listarDisciplinaEspecifica(char disciplina[]) {
             return;
         }
     }
+    voltarAoMenu();
 }
 
 int verificarProfessordisciplina(char professor[]) {
