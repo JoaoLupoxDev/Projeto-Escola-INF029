@@ -21,7 +21,6 @@ void excluirPessoa(char tipo);
 void atualizarPessoa(char tipo);
 int verificaMatricula(long matricula);
 int verificaCPF(char cpf[]);
-int lenTexto(char texto[]);
 void paraMaiuscula(char *str);
 void menu();
 

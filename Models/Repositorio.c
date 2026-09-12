@@ -366,8 +366,23 @@ void excluirPessoa(char tipo) {
 
 void atualizarPessoa(char tipo) {
     long matricula;
-    int validador;
+    int validador=0;
     char letra;
+    for (int i=0;i<indiceListaPessoas;i++){
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo){
+            validador = 1;
+            break;
+        }
+    }
+    if (validador == 0 && tipo == 'A'){
+        printf("Não há alunos cadastrados no momento.\n");
+        voltarAoMenu();
+        return;
+    }else if (validador == 0 && tipo == 'P'){
+        printf("Não há professores cadastrados no momento.\n");
+        voltarAoMenu();
+        return;
+    }
     listarPessoas(tipo);
     printf("\nDigite a matricula de quem voce deseja atualizar: ");
     scanf("%ld", &matricula);
@@ -423,8 +438,10 @@ void listarPessoas(char tipo) {
     }else{
     if (tipo == 'A'){
             printf("\nNão ha alunos cadastrados no momento.\n");
+            voltarAoMenu();
         }else{
             printf("Não ha professores cadastrados no momento");
+            voltarAoMenu();
         }    
     }
 }
@@ -439,9 +456,11 @@ void listarPessoasPorSexo(char sexo, char tipo) {
     }
     if (validador == 0 && tipo == 'A'){
         printf("Não há alunos cadastrados com esse sexo.\n");
+        voltarAoMenu();
         return;
     }else if (validador == 0 && tipo == 'P'){
         printf("Não há professores cadastrados com esse sexo.\n");
+        voltarAoMenu();
         return;
     }
     while (sexo != 'M' && sexo != 'F') {
@@ -491,6 +510,7 @@ int compararNomesSeguro(char s1[], char s2[]) {
 void listarPessoasPorNome(char tipo) {
     if (indiceListaPessoas == 0) {
         printf("\nNenhum cadastro encontrado.\n");
+        voltarAoMenu();
         return;
     }
     Pessoa NomesOrdenados[indiceListaPessoas]; 
@@ -504,8 +524,15 @@ void listarPessoasPorNome(char tipo) {
     }
 
     if (qtd == 0) {
-        printf("\nNenhum cadastro do tipo selecionado.\n");
-        return;
+        if (tipo == 'A') {
+            printf("\nNenhum aluno cadastrado.\n");
+            voltarAoMenu();
+            return;
+        } else if (tipo == 'P') {
+            printf("\nNenhum professor cadastrado.\n");
+            voltarAoMenu();
+            return;
+        }
     }
 
     for (int i = 0; i < qtd - 1; i++) {
@@ -551,9 +578,11 @@ void listarPessoasPorString(char tipo, char string[]) {
     }
     if (validador == 0 && tipo == 'A'){
         printf("Não há alunos cadastrados no momento.\n");
+        voltarAoMenu();
         return;
     }else if (validador == 0 && tipo == 'P'){
         printf("Não há professores cadastrados no momento.\n");
+        voltarAoMenu();
         return;
     }
     for(int i=0;i<indiceListaPessoas;i++){ //for para navegar nos nomes da lista
