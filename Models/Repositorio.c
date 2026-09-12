@@ -325,6 +325,22 @@ void cadastrarPessoa(char tipo) {
 }
 
 void excluirPessoa(char tipo) {
+    int validador=0;
+    for (int i=0;i<indiceListaPessoas;i++){
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo){
+            validador = 1;
+            break;
+        }
+    }
+    if (validador == 0 && tipo == 'A'){
+        printf("Não há alunos cadastrados no momento.\n");
+        voltarAoMenu();
+        return;
+    }else if (validador == 0 && tipo == 'P'){
+        printf("Não há professores cadastrados no momento.\n");
+        voltarAoMenu();
+        return;
+    }
     long matricula;
     char nomePessoa[50];
     listarPessoas(tipo);
@@ -411,7 +427,6 @@ void listarPessoas(char tipo) {
             printf("Não ha professores cadastrados no momento");
         }    
     }
-    voltarAoMenu();
 }
 
 void listarPessoasPorSexo(char sexo, char tipo) {
@@ -576,8 +591,7 @@ void listarDisciplinas(void) {
             listaDisciplinas[i].CodigoDisciplina, 
             listaDisciplinas[i].SemestreDisciplina, 
             listaDisciplinas[i].ProfessorDisciplina.Nome);
-    }
-    voltarAoMenu();
+    };
 }
 
 void listarDisciplinaEspecifica(char disciplina[]) {
