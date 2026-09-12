@@ -6,6 +6,10 @@
 #include <string.h>
 
 //redeclarar aqui todas as funcoes para evitar erros
+int verificarProfessordisciplina(char professor[]);
+void inserirAlunoNaDisciplina(void);
+void cadastrarDisciplina(void);
+void listarDisciplinas(void);
 void listarPessoas(char tipo);
 void listarPessoasPorNome(char tipo);
 void listarPessoasPorString(char tipo, char string[]);
