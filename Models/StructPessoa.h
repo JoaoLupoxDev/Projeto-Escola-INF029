@@ -7,7 +7,7 @@ typedef struct{
     char Nome[50];
     char Sexo; //pega apenas M ou F
     char DataNascimento[11];   
-    char CPF[15];
+    char CPF[11];
     char Tipo;
 }Pessoa;
 

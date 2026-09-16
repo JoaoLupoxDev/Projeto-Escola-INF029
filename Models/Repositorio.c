@@ -34,6 +34,7 @@ void listarPessoasPorNome(char tipo);
 void listarPessoasPorString(char tipo, char string[]);
 void cadastrarDisciplina(void);
 int verificarProfessordisciplina(char professor[]);
+void listarDisciplinasComMaisDe40Vagas(void);
 
 // --- FUNÇÕES UTILITÁRIAS ---
 
@@ -65,13 +66,24 @@ int verificaCPF(char cpf[]) {
     return validador;
 }
 
-int validaCPF(char cpf[]) {
-    (void)cpf;
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int validarFormatoCPF(const char *cpf) {
+    if (strlen(cpf) != 11) {
+        return 0;
+    }
+    for (int i = 0; i < 11; i++) {
+        if (!isdigit(cpf[i])) {
+            return 0;
+        }
+    }
     return 1;
 }
 
 int verificarData(char data[]) {
-    if (strlen(data) != 10) {
+    if (strlen(data) != 10) {   
         return 0;
     }
     if (data[2] != '/' || data[5] != '/') {
@@ -221,7 +233,7 @@ void menu(void) {
             case 3:
                 printf("\n-----MODULO DISCIPLINAS-----\n");
                 printf("1 - Cadastrar disciplina\n");
-                printf("2 - Listar uma disciplina e seus alunos matriculados\n");
+                printf("2 - Listar uma disciplina e seus alunos matriculados\n"); //listar disciplina especifica
                 printf("3 - Listar disciplinas que passam de 40 alunos matriculados\n");
                 printf("4 - Inserir/Excluir alunos em uma disciplina\n");
                 printf("0 - Sair do Modulo Disciplinas\n");
@@ -239,6 +251,8 @@ void menu(void) {
                         break;
                     case 2:
                     case 3:
+                        listarDisciplinasComMaisDe40Vagas();
+                        break;
                     case 4:
                         inserirAlunoNaDisciplina();
                         break;
@@ -286,12 +300,19 @@ void cadastrarPessoa(char tipo) {
         }
 
         printf("Digite o CPF a ser cadastrado: ");
-        getchar();
-        fgets(pessoa.CPF, sizeof(pessoa.CPF), stdin);
+        scanf(" %11s", pessoa.CPF); 
+
+        validador = validarFormatoCPF(pessoa.CPF);
+        while (validador == 0) {
+            printf("O formato do CPF esta errado, digite os 11 numeros sem pontos e hifen: ");
+            scanf("%11s", pessoa.CPF);
+            validador = validarFormatoCPF(pessoa.CPF);
+        }
         validador = verificaCPF(pessoa.CPF);
         while (validador == 0) {
             printf("Este CPF já está cadastrado, digite outro CPF: ");
             fgets(pessoa.CPF, sizeof(pessoa.CPF), stdin);
+            validador = verificaCPF(pessoa.CPF);
         }
 
         printf("Digite o sexo (M/F): ");
@@ -438,13 +459,12 @@ void listarPessoas(char tipo) {
         }voltarAoMenu();
 
     }else{
-    if (tipo == 'A'){
+        if (tipo == 'A'){
             printf("\nNão ha alunos cadastrados no momento.\n");
-            voltarAoMenu();
-        }else{
-            printf("Não ha professores cadastrados no momento");
-            voltarAoMenu();
-        }    
+        }else if (tipo == 'P'){
+            printf("Não ha professores cadastrados no momento.\n");
+        }
+        voltarAoMenu();
     }
 }
 
@@ -757,4 +777,25 @@ void inserirAlunoNaDisciplina(){
     }
 }
 
+void listarDisciplinasComMaisDe40Vagas(void){
+    if (indiceListaDisciplinas > 0){
+        int cont=0;
+        for (int i=0;i<indiceListaDisciplinas;i++){
+            if (listaDisciplinas[i].indiceAlunosMatriculados > 40){
+                    printf("Disciplina: %s Professor: %s Codigo: %ld Semestre: %d\n", 
+                    listaDisciplinas[i].NomeDisciplina,
+                    listaDisciplinas[i].ProfessorDisciplina.Nome,
+                    listaDisciplinas[i].CodigoDisciplina,
+                    listaDisciplinas[i].SemestreDisciplina);
+                    cont++;
+            }
+        }
+        if (cont == 0){
+            printf("Não existem disciplinas com mais de 40 vagas.");
+        }
+    }else{
+        printf("Não existem disciplinas cadastradas.");
+    }
+    voltarAoMenu();
+}
 #endif
