@@ -9,6 +9,7 @@ typedef struct{
     char DataNascimento[11];   
     char CPF[11];
     char Tipo;
+    int materiasmatriculadas=0;
 }Pessoa;
 
 typedef struct{

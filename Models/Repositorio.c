@@ -344,6 +344,7 @@ void cadastrarPessoa(char tipo) {
     listaGlobalPessoas.listaDePessoas[indiceListaPessoas] = pessoa;
     indiceListaPessoas++;
     listaGlobalPessoas.quantidadeTotal = indiceListaPessoas;
+    pessoa.materiasmatriculadas++;
 }
 
 void excluirPessoa(char tipo) {
