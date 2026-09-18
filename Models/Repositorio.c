@@ -31,6 +31,7 @@ void atualizarPessoa(char tipo);
 void listarPessoas(char tipo);
 void listarPessoasPorSexo(char sexo, char tipo);
 void listarPessoasPorNome(char tipo);
+void listarPessoasPorIdade(char tipo);
 void listarPessoasPorString(char tipo, char string[]);
 void cadastrarDisciplina(void);
 int verificarProfessordisciplina(char professor[]);
@@ -157,6 +158,7 @@ void menu(void) {
                             listarPessoasPorNome('A');
                             break;
                         case 7:
+                            listarPessoasPorIdade('A');
                             break;
                         case 8:
                          listarMenosDe3Disciplinas();
@@ -214,7 +216,8 @@ void menu(void) {
                         case 6:
                             listarPessoasPorNome('P');
                             break;
-                        case 7: 
+                        case 7:
+                            listarPessoasPorIdade('P'); 
                             break;
                         case 8:
                             printf("Digite um texto para buscar professores com base no texto: ");
@@ -572,22 +575,74 @@ void listarPessoasPorNome(char tipo) {
 
     printf("\n=== LISTA EM ORDEM ALFABETICA ===\n");
     for (int i = 0; i < qtd; i++) {
-        // Limpa o \n para o layout não quebrar
-        char nomeLimpo[50];
-        int idx = 0;
-        while (NomesOrdenados[i].Nome[idx] != '\0' && NomesOrdenados[i].Nome[idx] != '\n' && NomesOrdenados[i].Nome[idx] != '\r') {
-            nomeLimpo[idx] = NomesOrdenados[i].Nome[idx];
-            idx++;
-        }
-        nomeLimpo[idx] = '\0';
-
         printf("Nome: %s | Matricula: %ld | Sexo: %c | DataNasc: %s\n",
-               nomeLimpo,
+               NomesOrdenados[i].Nome,
                NomesOrdenados[i].Matricula,
                NomesOrdenados[i].Sexo,
                NomesOrdenados[i].DataNascimento);
     }
-    printf("===================================\n");
+    voltarAoMenu();
+
+}
+
+int compararIdade(char d1[], char d2[]){ // 08/07/2006 01/02/2000
+
+    int ano1 = ((d1[6]-'0')*1000 + (d1[7]-'0')*100 + (d1[8]-'0')*10 + (d1[9]-'0')); 
+    int ano2 = ((d2[6]-'0')*1000 + (d2[7]-'0')*100 + (d2[8]-'0')*10 + (d2[9]-'0'));
+    if(ano1 != ano2){
+        return ano1 - ano2;
+    }
+
+    int mes1 = ((d1[3]-'0')*10 + (d1[4]-'0')); 
+    int mes2 = ((d2[3]-'0')*10 + (d2[4]-'0')); 
+    if(mes1 != mes2){
+        return mes1 - mes2;
+    }
+
+    int dia1 = ((d1[0]-'0')*10 + (d1[1]-'0')); 
+    int dia2 = ((d2[0]-'0')*10 + (d2[1]-'0'));
+    return dia1 - dia2; 
+}
+
+void listarPessoasPorIdade(char tipo){
+    if (indiceListaPessoas == 0) {
+        printf("\nNenhum cadastro encontrado.\n");
+        return;
+    }
+    Pessoa IdadesOrdenadas[indiceListaPessoas]; 
+    int qtd = 0;
+
+    for (int i = 0; i < indiceListaPessoas; i++) {
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
+            IdadesOrdenadas[qtd] = listaGlobalPessoas.listaDePessoas[i];
+            qtd++;
+        }
+    }
+
+     if (qtd == 0) {
+        printf("\nNenhum cadastro do tipo selecionado.\n");
+        return;
+    }
+
+    for(int i = 0; i < qtd-1; i++){
+        for(int k = i+1; k<qtd; k++){
+            if(compararIdade(IdadesOrdenadas[i].DataNascimento, IdadesOrdenadas[k].DataNascimento) > 0){
+                Pessoa temp;
+                temp = IdadesOrdenadas[k];
+                IdadesOrdenadas[k] = IdadesOrdenadas[i];
+                IdadesOrdenadas[i] = temp;            
+            }
+        }
+    }
+
+    printf("\n=== LISTA POR DATA DE NASCIMENTO (CRONOLOGICA) ===\n");
+    for (int i = 0; i < qtd; i++) {
+        printf("Data Nasc: %s | Nome: %s | Matricula: %ld | Sexo: %c\n",
+               IdadesOrdenadas[i].DataNascimento,
+               IdadesOrdenadas[i].Nome,
+               IdadesOrdenadas[i].Matricula,
+               IdadesOrdenadas[i].Sexo);
+    }
     voltarAoMenu();
 
 }
