@@ -35,6 +35,7 @@ void listarPessoasPorString(char tipo, char string[]);
 void cadastrarDisciplina(void);
 int verificarProfessordisciplina(char professor[]);
 void listarDisciplinasComMaisDe40Vagas(void);
+void listarMenosDe3Disciplinas(void);
 
 // --- FUNÇÕES UTILITÁRIAS ---
 
@@ -158,6 +159,7 @@ void menu(void) {
                         case 7:
                             break;
                         case 8:
+                         listarMenosDe3Disciplinas();
                             break;
                         case 9:
                             printf("Digite um texto para buscar alunos com base no texto: ");
@@ -344,6 +346,7 @@ void cadastrarPessoa(char tipo) {
     listaGlobalPessoas.listaDePessoas[indiceListaPessoas] = pessoa;
     indiceListaPessoas++;
     listaGlobalPessoas.quantidadeTotal = indiceListaPessoas;
+    
 }
 
 void excluirPessoa(char tipo) {
@@ -757,12 +760,14 @@ void inserirAlunoNaDisciplina(){
                         validaAluno=1;
                         listaDisciplinas[indiceListaDisciplinas-1].AlunosMatriculados[listaDisciplinas[indiceListaDisciplinas-1].indiceAlunosMatriculados] = listaGlobalPessoas.listaDePessoas[i];
                         listaDisciplinas[indiceListaDisciplinas-1].indiceAlunosMatriculados++;
+                        listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas++;
                         break;
                     }
                 }
             } 
             if (validaAluno == 1){
                 printf("Aluno %s inserido.", nome);
+                
                 printf("Deseja inserir outro aluno? (1 - Sim | 0 - Não): ");
                 scanf("%d", &opcao);
                 if (opcao == 0){
@@ -797,5 +802,14 @@ void listarDisciplinasComMaisDe40Vagas(void){
         printf("Não existem disciplinas cadastradas.");
     }
     voltarAoMenu();
+}
+void listarMenosDe3Disciplinas(void){
+     for(int i=0;i<indiceListaPessoas;i++){
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A' && listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas < 3){
+            printf("Aluno: %s Matricula: %ld Quantidade de disciplinas: %d\n",listaGlobalPessoas.listaDePessoas[i].Nome,listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas );
+           
+        }
+     }
+     voltarAoMenu();
 }
 #endif
