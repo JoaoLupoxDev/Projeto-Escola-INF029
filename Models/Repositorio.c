@@ -161,6 +161,7 @@ void menu(void) {
                             listarPessoasPorIdade('A');
                             break;
                         case 8:
+                        
                          listarMenosDe3Disciplinas();
                             break;
                         case 9:
@@ -870,13 +871,35 @@ void listarDisciplinasComMaisDe40Vagas(void){
     voltarAoMenu();
 }
 void listarMenosDe3Disciplinas(void){
-     printf("\n=== LISTA ALUNOS EM MENOS DE 3 DISCIPLINAS ===\n");
+    int possuiAlunos = 0;
+    int alunosEncontrados = 0;
+     for (int i = 0; i < indiceListaPessoas; i++) {
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A') {
+            possuiAlunos = 1;
+            break;
+        }
+       
+    }
+     if(possuiAlunos == 0){
+            printf("Não existem alunos cadastrados no momento.\n");
+            voltarAoMenu();
+            return;
+        }
+
+    printf("\n=== ALUNOS COM MENOS DE 3 DISCIPLINAS ===\n");
      for(int i=0;i<indiceListaPessoas;i++){
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A' && listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas < 3){
-            printf("Aluno: %s Matricula: %ld Quantidade de disciplinas: %d\n",listaGlobalPessoas.listaDePessoas[i].Nome,listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas );
-           
+            printf("\nAluno: %s Matricula: %ld Quantidade de disciplinas: %d",listaGlobalPessoas.listaDePessoas[i].Nome,listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas );
+        
+            alunosEncontrados++;
         }
+     
+    }
+    if(alunosEncontrados == 0){
+        printf("Não existem alunos matriculados em menos de 3 disciplinas.\n");
      }
-     voltarAoMenu();
+    voltarAoMenu();
+    
+   
 }
 #endif
