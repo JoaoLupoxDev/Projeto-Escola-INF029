@@ -21,10 +21,13 @@ Disciplina listaDisciplinas[MAX_DISCIPLINAS];
 int verificaMatricula(long matricula);
 int verificaCPF(char cpf[]);
 int validaCPF(char cpf[]);
+int validarFormatoCPF(const char *cpf);
 int verificarData(char data[]);
+int lerInteiro();
 void paraMaiuscula(char *str);
 void inserirAlunoNaDisciplina(void);
 void menu(void);
+void voltarAoMenu(void);
 void cadastrarPessoa(char tipo);
 void excluirPessoa(char tipo);
 void atualizarPessoa(char tipo);
@@ -33,12 +36,36 @@ void listarPessoasPorSexo(char sexo, char tipo);
 void listarPessoasPorNome(char tipo);
 void listarPessoasPorIdade(char tipo);
 void listarPessoasPorString(char tipo, char string[]);
+void listarDisciplinas(void);
+void listarDisciplinaEspecifica(char disciplina[]);
 void cadastrarDisciplina(void);
 int verificarProfessordisciplina(char professor[]);
 void listarDisciplinasComMaisDe40Vagas(void);
 void listarMenosDe3Disciplinas(void);
 
 // --- FUNÇÕES UTILITÁRIAS ---
+
+int lerInteiro() {
+    int valor;
+    int resultado = scanf("%d", &valor);
+
+    while (resultado != 1) {
+        printf("Opção inválida! Digite apenas um número: ");
+        
+        // Limpa o lixo (como o "ajd[") do buffer
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+
+        // Tenta ler o novo número digitado pelo usuário
+        resultado = scanf("%d", &valor);
+    }
+
+    // Limpa o '\n' (Enter) que sobrou após ler o número válido
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    return valor;
+}
 
 void paraMaiuscula(char *str) {
     if (*str >= 'a' && *str <= 'z') {
@@ -67,10 +94,6 @@ int verificaCPF(char cpf[]) {
     }
     return validador;
 }
-
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 
 int validarFormatoCPF(const char *cpf) {
     if (strlen(cpf) != 11) {
@@ -116,7 +139,7 @@ void menu(void) {
         printf("3 - Modulo Disciplina\n");
         printf("0 - Sair do Menu\n");
         printf("Digite o numero referente a sua escolha: ");
-        scanf("%d", &escolhaMenu);
+        escolhaMenu = lerInteiro();
         
         switch (escolhaMenu) {
             case 1:
@@ -134,8 +157,8 @@ void menu(void) {
                     printf("9 - Buscar alunos por texto\n");
                     printf("0 - Sair do Módulo Aluno\n");
                     printf("Digite o numero referente a sua escolha: ");
-                    scanf("%d", &escolhaModulo);
-                    
+                    escolhaModulo = lerInteiro(); 
+
                     switch (escolhaModulo) {
                         case 1:
                             cadastrarPessoa('A');
@@ -161,12 +184,12 @@ void menu(void) {
                             listarPessoasPorIdade('A');
                             break;
                         case 8:
-                         listarMenosDe3Disciplinas();
+                            listarMenosDe3Disciplinas();
                             break;
                         case 9:
                             printf("Digite um texto para buscar alunos com base no texto: ");
-                            getchar();
                             fgets(texto, sizeof(texto), stdin);
+                            texto[strcspn(texto, "\n")] = '\0';
                             listarPessoasPorString('A', texto);         
                             break;
                         case 0:
@@ -193,7 +216,7 @@ void menu(void) {
                     printf("8 - Buscar professores por texto\n");
                     printf("0 - Sair do Módulo Professor\n");
                     printf("Digite o numero referente a sua escolha: ");
-                    scanf("%d", &escolhaModulo);
+                    escolhaModulo = lerInteiro();               
                     
                     switch (escolhaModulo) {
                         case 1:
@@ -208,9 +231,10 @@ void menu(void) {
                         case 4:
                             listarPessoas('P');
                             break;
-                        case 5:
+                        case 5:                         
                             printf("Digite o sexo (M - Masculino | F - Feminino): ");
                             scanf(" %c", &sexo);
+                            paraMaiuscula(&sexo);
                             listarPessoasPorSexo(sexo, 'P');
                             break;
                         case 6:
@@ -221,8 +245,8 @@ void menu(void) {
                             break;
                         case 8:
                             printf("Digite um texto para buscar professores com base no texto: ");
-                            getchar();
                             fgets(texto, sizeof(texto), stdin);
+                            texto[strcspn(texto, "\n")] = '\0';
                             listarPessoasPorString('P', texto);
                             break;
                         case 0:
@@ -238,18 +262,13 @@ void menu(void) {
             case 3:
                 printf("\n-----MODULO DISCIPLINAS-----\n");
                 printf("1 - Cadastrar disciplina\n");
-                printf("2 - Listar uma disciplina e seus alunos matriculados\n"); //listar disciplina especifica
+                printf("2 - Listar uma disciplina e seus alunos matriculados\n");
                 printf("3 - Listar disciplinas que passam de 40 alunos matriculados\n");
                 printf("4 - Inserir/Excluir alunos em uma disciplina\n");
                 printf("0 - Sair do Modulo Disciplinas\n");
                 printf("Digite o numero referente a sua escolha: ");
-                getchar();
-                scanf("%d", &escolhaModulo);
-                while (escolhaModulo < 0 || escolhaModulo > 4) {
-                    printf("Opção inválida. Digite novamente: ");
-                    getchar(); // Limpa o buffer do scanf anterior
-                    scanf("%d", &escolhaModulo);
-                }
+                escolhaModulo = lerInteiro();
+                
                 switch (escolhaModulo) {
                     case 1:
                         cadastrarDisciplina();
@@ -280,8 +299,7 @@ void menu(void) {
 void voltarAoMenu(void) {
     printf("\nPressione ENTER para voltar ao menu...");
     int c;
-    while ((c = getchar()) != '\n' && c != EOF); // Limpa qualquer coisa no buffer
-    getchar(); // Espera a tecla enter
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
 void cadastrarPessoa(char tipo) {
@@ -291,8 +309,8 @@ void cadastrarPessoa(char tipo) {
     if (tipo == 'A' || tipo == 'P') {
 
         printf("Digite o nome a ser cadastrado: ");
-        getchar(); // Limpa o buffer do scanf anterior
         fgets(pessoa.Nome, sizeof(pessoa.Nome), stdin);
+        pessoa.Nome[strcspn(pessoa.Nome, "\n")] = '\0';
 
         printf("Digite a matricula a ser cadastrada: ");
         scanf("%ld", &pessoa.Matricula);
@@ -315,13 +333,13 @@ void cadastrarPessoa(char tipo) {
         validador = verificaCPF(pessoa.CPF);
         while (validador == 0) {
             printf("Este CPF já está cadastrado, digite outro CPF: ");
-            scanf(" %11s", &pessoa.CPF);
+            scanf(" %11s", pessoa.CPF);
             validador = verificaCPF(pessoa.CPF);
         }
 
         printf("Digite o sexo (M/F): ");
         scanf(" %c", &pessoa.Sexo);
-        paraMaiuscula(&pessoa.Sexo);
+        paraMaiuscula(&pessoa.Sexo);    
         while (pessoa.Sexo != 'M' && pessoa.Sexo != 'F') {
             printf("Digite apenas M(masculino) ou F(feminino): ");
             scanf(" %c", &pessoa.Sexo);
@@ -329,12 +347,16 @@ void cadastrarPessoa(char tipo) {
         }
 
         printf("Digite a data de nascimento (dd/mm/aaaa): ");
-        getchar();
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
         fgets(pessoa.DataNascimento, sizeof(pessoa.DataNascimento), stdin);
+        pessoa.DataNascimento[strcspn(pessoa.DataNascimento, "\n")] = '\0';
+        
         validador = verificarData(pessoa.DataNascimento);
         while (validador == 0) {
             printf("Digite uma data valida (dd/mm/aaaa): ");
             fgets(pessoa.DataNascimento, sizeof(pessoa.DataNascimento), stdin);
+            pessoa.DataNascimento[strcspn(pessoa.DataNascimento, "\n")] = '\0';
             validador = verificarData(pessoa.DataNascimento);
         }
 
@@ -346,12 +368,11 @@ void cadastrarPessoa(char tipo) {
         }
     }
 
-    pessoa.Tipo = tipo; //Atribui o tipo aqui para garantir que n foi sobrescrito pelo "%11s" do scanf
+    pessoa.Tipo = tipo;
 
     listaGlobalPessoas.listaDePessoas[indiceListaPessoas] = pessoa;
     indiceListaPessoas++;
     listaGlobalPessoas.quantidadeTotal = indiceListaPessoas;
-    
 }
 
 void excluirPessoa(char tipo) {
@@ -397,7 +418,6 @@ void excluirPessoa(char tipo) {
 void atualizarPessoa(char tipo) {
     long matricula;
     int validador=0;
-    char letra;
     for (int i=0;i<indiceListaPessoas;i++){
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo){
             validador = 1;
@@ -416,28 +436,32 @@ void atualizarPessoa(char tipo) {
     listarPessoas(tipo);
     printf("\nDigite a matricula de quem voce deseja atualizar: ");
     scanf("%ld", &matricula);
-    getchar();
 
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (matricula == listaGlobalPessoas.listaDePessoas[i].Matricula && tipo == listaGlobalPessoas.listaDePessoas[i].Tipo) {
             printf("Digite o novo nome: ");
-            // CORRIGIDO: Usa sizeof em vez de lenTexto para evitar corrupção de memória
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
             fgets(listaGlobalPessoas.listaDePessoas[i].Nome, sizeof(listaGlobalPessoas.listaDePessoas[i].Nome), stdin);
+            listaGlobalPessoas.listaDePessoas[i].Nome[strcspn(listaGlobalPessoas.listaDePessoas[i].Nome, "\n")] = '\0';
             
             printf("Digite o novo CPF: ");
             fgets(listaGlobalPessoas.listaDePessoas[i].CPF, sizeof(listaGlobalPessoas.listaDePessoas[i].CPF), stdin);
-            
+            listaGlobalPessoas.listaDePessoas[i].CPF[strcspn(listaGlobalPessoas.listaDePessoas[i].CPF, "\n")] = '\0';
+
             printf("Digite o novo sexo: ");
             scanf(" %c", &listaGlobalPessoas.listaDePessoas[i].Sexo);
-            getchar();
             
             printf("Digite a nova data de nascimento: ");
-            getchar();
+            while ((c = getchar()) != '\n' && c != EOF);
             fgets(listaGlobalPessoas.listaDePessoas[i].DataNascimento, sizeof(listaGlobalPessoas.listaDePessoas[i].DataNascimento), stdin);
+            listaGlobalPessoas.listaDePessoas[i].DataNascimento[strcspn(listaGlobalPessoas.listaDePessoas[i].DataNascimento, "\n")] = '\0';
+            
             validador = verificarData(listaGlobalPessoas.listaDePessoas[i].DataNascimento);
             while (validador == 0) {
                 printf("Digite uma data valida (dd/mm/aaaa): ");
                 fgets(listaGlobalPessoas.listaDePessoas[i].DataNascimento, sizeof(listaGlobalPessoas.listaDePessoas[i].DataNascimento), stdin);
+                listaGlobalPessoas.listaDePessoas[i].DataNascimento[strcspn(listaGlobalPessoas.listaDePessoas[i].DataNascimento, "\n")] = '\0';
                 validador = verificarData(listaGlobalPessoas.listaDePessoas[i].DataNascimento);
             }
 
@@ -457,10 +481,10 @@ void listarPessoas(char tipo) {
     }
     if (validador == 1){
         if(tipo == 'A' || tipo == 'a'){
-        printf("\n=== LISTA DE ALUNOS ===\n");
+            printf("\n=== LISTA DE ALUNOS ===\n");
         }
-         if(tipo == 'P' || tipo == 'p'){
-        printf("\n=== LISTA DE PROFESSORES ===\n");
+        if(tipo == 'P' || tipo == 'p'){
+            printf("\n=== LISTA DE PROFESSORES ===\n");
         }
 
         for (int i = 0; i < indiceListaPessoas; i++) {
@@ -471,7 +495,8 @@ void listarPessoas(char tipo) {
                    listaGlobalPessoas.listaDePessoas[i].Sexo, 
                    listaGlobalPessoas.listaDePessoas[i].DataNascimento);
             }
-        }voltarAoMenu();
+        }
+        voltarAoMenu();
 
     }else{
         if (tipo == 'A'){
@@ -524,18 +549,13 @@ int compararNomesSeguro(char s1[], char s2[]) {
         char c1 = s1[i];
         char c2 = s2[i];
 
-        if (c1 == '\n' || c1 == '\r') 
-        c1 = '\0';
-        if (c2 == '\n' || c2 == '\r') 
-        c2 = '\0';
+        if (c1 == '\n' || c1 == '\r') c1 = '\0';
+        if (c2 == '\n' || c2 == '\r') c2 = '\0';
 
-        if (c1 == '\0' || c2 == '\0') 
-        break;
+        if (c1 == '\0' || c2 == '\0') break;
 
-        if (c1 >= 'A' && c1 <= 'Z') 
-        c1 += 32;
-        if (c2 >= 'A' && c2 <= 'Z') 
-        c2 += 32;
+        if (c1 >= 'A' && c1 <= 'Z') c1 += 32;
+        if (c2 >= 'A' && c2 <= 'Z') c2 += 32;
 
         if (c1 != c2) {
             return c1 - c2;
@@ -592,11 +612,9 @@ void listarPessoasPorNome(char tipo) {
                NomesOrdenados[i].DataNascimento);
     }
     voltarAoMenu();
-
 }
 
-int compararIdade(char d1[], char d2[]){ // 08/07/2006 01/02/2000
-
+int compararIdade(char d1[], char d2[]){
     int ano1 = ((d1[6]-'0')*1000 + (d1[7]-'0')*100 + (d1[8]-'0')*10 + (d1[9]-'0')); 
     int ano2 = ((d2[6]-'0')*1000 + (d2[7]-'0')*100 + (d2[8]-'0')*10 + (d2[9]-'0'));
     if(ano1 != ano2){
@@ -629,7 +647,7 @@ void listarPessoasPorIdade(char tipo){
         }
     }
 
-     if (qtd == 0) {
+    if (qtd == 0) {
         printf("\nNenhum cadastro do tipo selecionado.\n");
         return;
     }
@@ -654,64 +672,54 @@ void listarPessoasPorIdade(char tipo){
                IdadesOrdenadas[i].Sexo);
     }
     voltarAoMenu();
-
 }
 
 void listarPessoasPorString(char tipo, char string[]) {
-    int contador=0, contadorPrints=0;
-    int validador=0;
-    for (int i=0;i<indiceListaPessoas;i++){
-        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo){
+    int validador = 0;
+
+    for (int i = 0; i < indiceListaPessoas; i++) {
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
             validador = 1;
             break;
         }
     }
-    if (validador == 0 && tipo == 'A'){
-        printf("Não há alunos cadastrados no momento.\n");
-        voltarAoMenu();
-        return;
-    }else if (validador == 0 && tipo == 'P'){
-        printf("Não há professores cadastrados no momento.\n");
+
+    if (validador == 0) {
+        if (tipo == 'A') {
+            printf("Não há alunos cadastrados no momento.\n");
+        } else if (tipo == 'P') {
+            printf("Não há professores cadastrados no momento.\n");
+        }
         voltarAoMenu();
         return;
     }
-    for(int i=0;i<indiceListaPessoas;i++){ //for para navegar nos nomes da lista
-        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo){
-            for (int c=0;c<strlen(listaGlobalPessoas.listaDePessoas[i].Nome);c++){ //for para navegar nas letras do nome
-                for (int x=0;x<strlen(string);x++){ //for para navegar nas letras da string de busca
-                    if (listaGlobalPessoas.listaDePessoas[i].Nome[c] == string[x]){
-                        contador++;
-                        c++;
-                        for (int y=0;y<strlen(string);y++){
-                            if (string[y] == listaGlobalPessoas.listaDePessoas[i].Nome[c]){
-                                string[y] = '/';
-                            }
-                        }
-                    }
-                }
-            }
-            if(contador>=strlen(string)){
-                printf("Nome: %s\n",listaGlobalPessoas.listaDePessoas[i].Nome);
-                contador=0;
+
+    int contadorPrints = 0;
+
+    for (int i = 0; i < indiceListaPessoas; i++) {
+        if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
+            if (strstr(listaGlobalPessoas.listaDePessoas[i].Nome, string) != NULL) {
+                printf("Nome: %s\n", listaGlobalPessoas.listaDePessoas[i].Nome);
                 contadorPrints++;
             }
         }
-        if (i == indiceListaPessoas-1 && contadorPrints == 0){
-            printf("Não foram encontrados nomes com base no texto digitado.\n");
-        }
     }
+
+    if (contadorPrints == 0) {
+        printf("Não foram encontrados nomes com base no texto digitado.\n");
+    }
+
     voltarAoMenu();
 }
 
 void listarDisciplinas(void) {
-    
     for (int i = 0; i < indiceListaDisciplinas; i++) {
         printf("Nome: %s Codigo: %ld\n  Semestre: %d Professor: %s\n",
             listaDisciplinas[i].NomeDisciplina,
             listaDisciplinas[i].CodigoDisciplina, 
             listaDisciplinas[i].SemestreDisciplina, 
             listaDisciplinas[i].ProfessorDisciplina.Nome);
-    };
+    }
 }
 
 void listarDisciplinaEspecifica(char disciplina[]) {
@@ -723,9 +731,6 @@ void listarDisciplinaEspecifica(char disciplina[]) {
                 listaDisciplinas[i].SemestreDisciplina,
                 listaDisciplinas[i].ProfessorDisciplina.Nome);
 
-            for (int j = 0; j < 10; j++) { 
-                // navegação nos alunos
-            }
             return;
         }
     }
@@ -748,13 +753,16 @@ void cadastrarDisciplina(void) {
     for (int i = 0; i < indiceListaPessoas; i++){
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'P'){
             validador = 1;
+            break;
         }
     }
     if (validador == 1){
         Disciplina disciplina;
         printf("Digite o nome da disciplina: ");
-        getchar();
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
         fgets(disciplina.NomeDisciplina, sizeof(disciplina.NomeDisciplina), stdin);
+        disciplina.NomeDisciplina[strcspn(disciplina.NomeDisciplina, "\n")] = '\0';
 
         printf("Digite o codigo da disciplina: ");
         scanf("%ld", &disciplina.CodigoDisciplina);
@@ -770,10 +778,14 @@ void cadastrarDisciplina(void) {
         printf("Lista de professores cadastrados:\n");
         listarPessoas('P');
         printf("Atribua um professor a disciplina: ");
+        while ((c = getchar()) != '\n' && c != EOF);
         fgets(disciplina.ProfessorDisciplina.Nome, sizeof(disciplina.ProfessorDisciplina.Nome), stdin);
+        disciplina.ProfessorDisciplina.Nome[strcspn(disciplina.ProfessorDisciplina.Nome, "\n")] = '\0';
+
         while (verificarProfessordisciplina(disciplina.ProfessorDisciplina.Nome) == 0) {
             printf("Professor não encontrado ou cadastrado, Digite um professor válido: ");
-            fgets(disciplina.ProfessorDisciplina.Nome, sizeof(disciplina.ProfessorDisciplina.Nome),stdin);
+            fgets(disciplina.ProfessorDisciplina.Nome, sizeof(disciplina.ProfessorDisciplina.Nome), stdin);
+            disciplina.ProfessorDisciplina.Nome[strcspn(disciplina.ProfessorDisciplina.Nome, "\n")] = '\0';
         }
         listaDisciplinas[indiceListaDisciplinas] = disciplina;
         indiceListaDisciplinas++;
@@ -782,68 +794,75 @@ void cadastrarDisciplina(void) {
         printf("É preciso cadastrar professores antes de cadastrar uma disciplina.");
         voltarAoMenu();
     }
-    
 }
 
-
 void inserirAlunoNaDisciplina(){
-    if (indiceListaDisciplinas < 0){
+    if (indiceListaDisciplinas <= 0){
         printf("Não existem disciplinas cadastradas.");
         return;
     }
-    else if (indiceListaPessoas < 0){
+    if (indiceListaPessoas <= 0){
         printf("Não existem alunos cadastrados.");
         return;
-    }else{
-        int opcao, validaDisciplina=0, validaAluno=0;
-        char nome[50];
-        listarDisciplinas();
-        while (opcao != 0){
-            printf("\nDigite o nome da disciplina que deseja inserir o(s) aluno(s): ");
-            getchar();
-            fgets(nome, 50, stdin);
-            for (int i=0;i<indiceListaDisciplinas;i++){
-                if (strcmp(listaDisciplinas[i].NomeDisciplina, nome) == 0){
-                    validaDisciplina=1;
-                }
-            }
-            if (validaDisciplina == 1){
-                printf("\nDisciplina %s selecionada\n", nome);
+    }
+
+    int opcao = -1, validaDisciplina = 0, validaAluno = 0;
+    char nome[50];
+    listarDisciplinas();
+    
+    while (opcao != 0){
+        printf("\nDigite o nome da disciplina que deseja inserir o(s) aluno(s): ");
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+        fgets(nome, sizeof(nome), stdin);
+        nome[strcspn(nome, "\n")] = '\0';
+
+        for (int i = 0; i < indiceListaDisciplinas; i++){
+            if (strcmp(listaDisciplinas[i].NomeDisciplina, nome) == 0){
+                validaDisciplina = 1;
                 break;
-            }else{
-                printf("\nDigite corretamente o nome da disciplina.\n");
             }
         }
-        printf("\nLista de alunos cadastrados:\n");
-        listarPessoas('A');
-        while (opcao != 0){
-            printf("Digite o nome do aluno que deseja inserir na disciplina: ");
-            getchar();
-            fgets(nome, 50, stdin);
-            for (int i=0;i<indiceListaPessoas;i++){
-                if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A'){
-                    if (strcmp(listaGlobalPessoas.listaDePessoas[i].Nome, nome) == 0){
-                        validaAluno=1;
-                        listaDisciplinas[indiceListaDisciplinas-1].AlunosMatriculados[listaDisciplinas[indiceListaDisciplinas-1].indiceAlunosMatriculados] = listaGlobalPessoas.listaDePessoas[i];
-                        listaDisciplinas[indiceListaDisciplinas-1].indiceAlunosMatriculados++;
-                        listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas++;
-                        break;
-                    }
-                }
-            } 
-            if (validaAluno == 1){
-                printf("Aluno %s inserido.", nome);
-                
-                printf("Deseja inserir outro aluno? (1 - Sim | 0 - Não): ");
-                scanf("%d", &opcao);
-                if (opcao == 0){
+        if (validaDisciplina == 1){
+            printf("\nDisciplina %s selecionada\n", nome);
+            break;
+        } else {
+            printf("\nDigite corretamente o nome da disciplina.\n");
+        }
+    }
+
+    printf("\nLista de alunos cadastrados:\n");
+    listarPessoas('A');
+
+    while (opcao != 0){
+        printf("Digite o nome do aluno que deseja inserir na disciplina: ");
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+        fgets(nome, sizeof(nome), stdin);
+        nome[strcspn(nome, "\n")] = '\0';
+
+        for (int i = 0; i < indiceListaPessoas; i++){
+            if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A'){
+                if (strcmp(listaGlobalPessoas.listaDePessoas[i].Nome, nome) == 0){
+                    validaAluno = 1;
+                    listaDisciplinas[indiceListaDisciplinas-1].AlunosMatriculados[listaDisciplinas[indiceListaDisciplinas-1].indiceAlunosMatriculados] = listaGlobalPessoas.listaDePessoas[i];
+                    listaDisciplinas[indiceListaDisciplinas-1].indiceAlunosMatriculados++;
+                    listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas++;
                     break;
-                }else if (opcao != 1){
-                    printf("Opção inválida, digite 1 para sim ou 0 para não.");
                 }
-            }else{
-                printf("Digite corretamente o nome do aluno.");
             }
+        } 
+        if (validaAluno == 1){
+            printf("Aluno %s inserido.", nome);
+            printf("Deseja inserir outro aluno? (1 - Sim | 0 - Não): ");
+            scanf("%d", &opcao);
+            if (opcao == 0){
+                break;
+            } else if (opcao != 1){
+                printf("Opção inválida, digite 1 para sim ou 0 para não.");
+            }
+        } else {
+            printf("Digite corretamente o nome do aluno.");
         }
     }
 }
@@ -869,14 +888,17 @@ void listarDisciplinasComMaisDe40Vagas(void){
     }
     voltarAoMenu();
 }
+
 void listarMenosDe3Disciplinas(void){
-     printf("\n=== LISTA ALUNOS EM MENOS DE 3 DISCIPLINAS ===\n");
-     for(int i=0;i<indiceListaPessoas;i++){
+    printf("\n=== LISTA ALUNOS EM MENOS DE 3 DISCIPLINAS ===\n");
+    for(int i=0;i<indiceListaPessoas;i++){
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A' && listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas < 3){
-            printf("Aluno: %s Matricula: %ld Quantidade de disciplinas: %d\n",listaGlobalPessoas.listaDePessoas[i].Nome,listaGlobalPessoas.listaDePessoas[i].Matricula, listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas );
-           
+            printf("Aluno: %s Matricula: %ld Quantidade de disciplinas: %d\n",
+                listaGlobalPessoas.listaDePessoas[i].Nome,
+                listaGlobalPessoas.listaDePessoas[i].Matricula, 
+                listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas);
         }
-     }
-     voltarAoMenu();
+    }
 }
+
 #endif
