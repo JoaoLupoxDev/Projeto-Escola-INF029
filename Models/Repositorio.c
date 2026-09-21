@@ -187,12 +187,7 @@ void menu(void) {
                             listarPessoasPorIdade('A');
                             break;
                         case 8:
-<<<<<<< HEAD
-                        
-                         listarMenosDe3Disciplinas();
-=======
                             listarMenosDe3Disciplinas();
->>>>>>> c2211b3f28c2b39bd84df45be8bbe34dd1ed1ae2
                             break;
                         case 9:
                             printf("Digite um texto para buscar alunos com base no texto: ");
@@ -992,7 +987,6 @@ void listarDisciplinasComMaisDe40Vagas(void){
 }
 
 void listarMenosDe3Disciplinas(void){
-<<<<<<< HEAD
     int possuiAlunos = 0;
     int alunosEncontrados = 0;
      for (int i = 0; i < indiceListaPessoas; i++) {
@@ -1023,17 +1017,6 @@ void listarMenosDe3Disciplinas(void){
     voltarAoMenu();
     
    
-=======
-    printf("\n=== LISTA ALUNOS EM MENOS DE 3 DISCIPLINAS ===\n");
-    for(int i=0;i<indiceListaPessoas;i++){
-        if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A' && listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas < 3){
-            printf("Aluno: %s Matricula: %ld Quantidade de disciplinas: %d\n",
-                listaGlobalPessoas.listaDePessoas[i].Nome,
-                listaGlobalPessoas.listaDePessoas[i].Matricula, 
-                listaGlobalPessoas.listaDePessoas[i].materiasmatriculadas);
-        }
-    }
->>>>>>> c2211b3f28c2b39bd84df45be8bbe34dd1ed1ae2
 }
 
 #endif

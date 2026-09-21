@@ -23,6 +23,8 @@ int verificaMatricula(long matricula);
 int verificaCPF(char cpf[]);
 void paraMaiuscula(char *str);
 void menu();
+void listarDisciplinasComMaisDe40Vagas(void);
+void listarMenosDe3Disciplinas(void);
 
 
 //execução do codigo principal aqui:
