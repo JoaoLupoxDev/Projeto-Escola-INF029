@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 // --- VARIÁVEIS GLOBAIS ---
 int indiceListaPessoas = 0;
@@ -42,6 +43,7 @@ void cadastrarDisciplina(void);
 int verificarProfessordisciplina(char professor[]);
 void listarDisciplinasComMaisDe40Vagas(void);
 void listarMenosDe3Disciplinas(void);
+void listaAniversariantesDoMes(void);
 
 // --- FUNÇÕES UTILITÁRIAS ---
 
@@ -137,6 +139,7 @@ void menu(void) {
         printf("1 - Modulo Aluno\n");
         printf("2 - Modulo Professor\n");
         printf("3 - Modulo Disciplina\n");
+        printf("4 - Aniversariantes do mes\n");
         printf("0 - Sair do Menu\n");
         printf("Digite o numero referente a sua escolha: ");
         escolhaMenu = lerInteiro();
@@ -285,7 +288,10 @@ void menu(void) {
                         break;
                 }
                 break;
-                
+
+            case 4:
+                listaAniversariantesDoMes();
+
             case 0:
                 printf("Saindo do menu... Programa encerrado\n");
                 break;
@@ -571,12 +577,12 @@ void listarPessoasPorNome(char tipo) {
         voltarAoMenu();
         return;
     }
-    Pessoa NomesOrdenados[indiceListaPessoas]; 
+    Pessoa nomesOrdenados[indiceListaPessoas]; 
     int qtd = 0;
 
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
-            NomesOrdenados[qtd] = listaGlobalPessoas.listaDePessoas[i];
+            nomesOrdenados[qtd] = listaGlobalPessoas.listaDePessoas[i];
             qtd++;
         }
     }
@@ -595,10 +601,10 @@ void listarPessoasPorNome(char tipo) {
 
     for (int i = 0; i < qtd - 1; i++) {
         for (int k = i + 1; k < qtd; k++) {
-            if (compararNomesSeguro(NomesOrdenados[i].Nome, NomesOrdenados[k].Nome) > 0) {
-                Pessoa temp = NomesOrdenados[i];
-                NomesOrdenados[i] = NomesOrdenados[k];
-                NomesOrdenados[k] = temp;
+            if (compararNomesSeguro(nomesOrdenados[i].Nome, nomesOrdenados[k].Nome) > 0) {
+                Pessoa temp = nomesOrdenados[i];
+                nomesOrdenados[i] = nomesOrdenados[k];
+                nomesOrdenados[k] = temp;
             }
         }
     }
@@ -606,10 +612,10 @@ void listarPessoasPorNome(char tipo) {
     printf("\n=== LISTA EM ORDEM ALFABETICA ===\n");
     for (int i = 0; i < qtd; i++) {
         printf("Nome: %s | Matricula: %ld | Sexo: %c | DataNasc: %s\n",
-               NomesOrdenados[i].Nome,
-               NomesOrdenados[i].Matricula,
-               NomesOrdenados[i].Sexo,
-               NomesOrdenados[i].DataNascimento);
+               nomesOrdenados[i].Nome,
+               nomesOrdenados[i].Matricula,
+               nomesOrdenados[i].Sexo,
+               nomesOrdenados[i].DataNascimento);
     }
     voltarAoMenu();
 }
@@ -631,6 +637,97 @@ int compararIdade(char d1[], char d2[]){
     int dia2 = ((d2[0]-'0')*10 + (d2[1]-'0'));
     return dia1 - dia2; 
 }
+
+void listaAniversariantesDoMes(void) {
+    // define o mes atual
+    time_t t = time(NULL);           
+    struct tm tm = *localtime(&t);   
+    int mesAtual = tm.tm_mon + 1; 
+
+    if (indiceListaPessoas == 0) {
+        printf("\nNao ha pessoas cadastradas no momento.\n");
+        voltarAoMenu();
+        return;
+    }
+
+    Pessoa alunosAniversariantes[indiceListaPessoas];  
+    Pessoa professoresAniversariantes[indiceListaPessoas];  
+    int qtdAlunos = 0;
+    int qtdProfessores = 0;
+
+    printf("\n=== LISTA ANIVERSARIANTES DESSE MES (%d) ===\n", mesAtual);
+    
+    for (int i = 0; i < indiceListaPessoas; i++) {
+        int mesNascimento = ((listaGlobalPessoas.listaDePessoas[i].DataNascimento[3] - '0') * 10) + 
+                            (listaGlobalPessoas.listaDePessoas[i].DataNascimento[4] - '0');
+
+        if (mesAtual == mesNascimento) {
+            if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A') {
+                alunosAniversariantes[qtdAlunos] = listaGlobalPessoas.listaDePessoas[i];
+                qtdAlunos++;
+            } else if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'P') {
+                professoresAniversariantes[qtdProfessores] = listaGlobalPessoas.listaDePessoas[i];
+                qtdProfessores++;
+            }
+        }
+    }
+
+    if (qtdAlunos == 0 && qtdProfessores == 0) {
+        printf("Nenhum aniversariante no mes.\n");
+        voltarAoMenu();
+        return;
+    }
+
+    for (int i = 0; i < qtdAlunos - 1; i++) {
+        for (int k = i + 1; k < qtdAlunos; k++) {
+            int dia1 = (alunosAniversariantes[i].DataNascimento[0]-'0')*10 + (alunosAniversariantes[i].DataNascimento[1]-'0');
+            int dia2 = (alunosAniversariantes[k].DataNascimento[0]-'0')*10 + (alunosAniversariantes[k].DataNascimento[1]-'0');
+            if (dia1 > dia2) {
+                Pessoa temp = alunosAniversariantes[i];
+                alunosAniversariantes[i] = alunosAniversariantes[k];
+                alunosAniversariantes[k] = temp;
+            }
+        }   
+    }
+
+    for (int i = 0; i < qtdProfessores - 1; i++) {
+        for (int k = i + 1; k < qtdProfessores; k++) {
+            int dia1 = (professoresAniversariantes[i].DataNascimento[0]-'0')*10 + (professoresAniversariantes[i].DataNascimento[1]-'0');
+            int dia2 = (professoresAniversariantes[k].DataNascimento[0]-'0')*10 + (professoresAniversariantes[k].DataNascimento[1]-'0');
+            if (dia1 > dia2) {
+                Pessoa temp = professoresAniversariantes[i];
+                professoresAniversariantes[i] = professoresAniversariantes[k];
+                professoresAniversariantes[k] = temp;
+            }
+        }   
+    }
+
+    printf("\n   ALUNOS   \n");
+    if (qtdAlunos == 0) {
+        printf("Nenhum aluno aniversariante este mes.\n");
+    } else {
+        for (int i = 0; i < qtdAlunos; i++) {
+            printf("Nome: %s | Aniversario: %s | Matricula: %ld\n",
+                   alunosAniversariantes[i].Nome,
+                   alunosAniversariantes[i].DataNascimento,
+                   alunosAniversariantes[i].Matricula);
+        }
+    }
+
+    printf("\n   PROFESSORES   \n");
+    if (qtdProfessores == 0) {
+        printf("Nenhum professor aniversariante este mes.\n");
+    } else {
+        for (int i = 0; i < qtdProfessores; i++) {
+            printf("Nome: %s | Aniversario: %s | Matricula: %ld\n",
+                   professoresAniversariantes[i].Nome,
+                   professoresAniversariantes[i].DataNascimento,
+                   professoresAniversariantes[i].Matricula);
+        }
+    }
+    voltarAoMenu();    
+}
+
 
 void listarPessoasPorIdade(char tipo){
     if (indiceListaPessoas == 0) {
