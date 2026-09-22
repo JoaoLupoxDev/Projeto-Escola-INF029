@@ -27,7 +27,6 @@ void listarDisciplinasComMaisDe40Vagas(void);
 void listarMenosDe3Disciplinas(void);
 
 
-//execução do codigo principal aqui:
 int main() {
     menu();
     return 0;
