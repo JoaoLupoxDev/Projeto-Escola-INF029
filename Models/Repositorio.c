@@ -178,6 +178,7 @@ void menu(void) {
                         case 5:
                             printf("Digite o sexo (M - Masculino | F - Feminino): ");
                             scanf(" %c", &sexo);
+                            paraMaiuscula(&sexo);
                             listarPessoasPorSexo(sexo, 'A');
                             break;
                         case 6:
