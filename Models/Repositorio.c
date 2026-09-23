@@ -1,34 +1,37 @@
-#ifndef REPOSITORIO_H
-#define REPOSITORIO_H
-
-#include "StructPessoa.h"
-#include "StructDisciplina.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
 
-// --- VARIÁVEIS GLOBAIS ---
+#include "StructPessoa.h"
+#include "StructDisciplina.h"
+
 int indiceListaPessoas = 0;
 ListaPessoas listaGlobalPessoas;
-int quantidadeAlunos = 0;
-int quantidadeProfessores = 0;
+
 int indiceListaDisciplinas = 0;
 Disciplina listaDisciplinas[MAX_DISCIPLINAS];
 
-// --- PROTÓTIPOS DE FUNÇÕES ---
+// Protótipos
 int verificaMatricula(long matricula);
 int ehCPFValido(const char cpf[]);
 int verificaCPF(char cpf[]);
 int verificaCPFExcluindoMatricula(char cpf[], long matriculaAtual);
+int ehBissexto(int ano);
 int verificarData(char data[]);
-int lerInteiro(void);
-void limparBuffer(void);
+int lerInteiro();
+void limparBuffer();
 void paraMaiuscula(char *str);
-void inserirAlunoNaDisciplina(void);
-void menu(void);
-void voltarAoMenu(void);
+void paraMinusculoString(char *destino, const char *origem);
+int compararNomesSeguro(char s1[], char s2[]);
+int compararIdade(char d1[], char d2[]);
+int comparaStringsInsensivel(const char *s1, const char *s2);
+int verificaCodigoDisciplina(long codigo);
+
+void menu();
+void voltarAoMenu();
+
 void cadastrarPessoa(char tipo);
 void excluirPessoa(char tipo);
 void atualizarPessoa(char tipo);
@@ -37,22 +40,39 @@ void listarPessoasPorSexo(char sexo, char tipo);
 void listarPessoasPorNome(char tipo);
 void listarPessoasPorIdade(char tipo);
 void listarPessoasPorString(char tipo, char string[]);
-void listarDisciplinas(void);
-void listarDisciplinaEspecifica(char disciplina[]);
-void cadastrarDisciplina(void);
+void listaAniversariantesDoMes();
+
+void cadastrarDisciplina();
+void listarDisciplinas();
 int verificarProfessordisciplina(char professor[]);
-void listarDisciplinasComMaisDe40Vagas(void);
-void listarMenosDe3Disciplinas(void);
-void listaAniversariantesDoMes(void);
+void inserirAlunoNaDisciplina();
+void listarDisciplinasComMaisDe40Vagas();
+void listarMenosDe3Disciplinas();
 
-// --- FUNÇÕES UTILITÁRIAS E VALIDAÇÕES ---
+// Função para comparar duas strings ignorando maiúsculas e minúsculas
+int comparaStringsInsensivel(const char *s1, const char *s2) {
+    char str1Lower[100];
+    char str2Lower[100];
+    paraMinusculoString(str1Lower, s1);
+    paraMinusculoString(str2Lower, s2);
+    return strcmp(str1Lower, str2Lower);
+}
 
-void limparBuffer(void) {
+int verificaCodigoDisciplina(long codigo) {
+    for (int i = 0; i < indiceListaDisciplinas; i++) {
+        if (listaDisciplinas[i].CodigoDisciplina == codigo) {
+            return 0; // Código já existe
+        }
+    }
+    return 1; // Código livre
+}
+
+void limparBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-int lerInteiro(void) {
+int lerInteiro() {
     int valor;
     int resultado = scanf("%d", &valor);
 
@@ -67,18 +87,34 @@ int lerInteiro(void) {
 }
 
 void paraMaiuscula(char *str) {
-    if (str && *str >= 'a' && *str <= 'z') {
-        *str -= 32;
+    if (str) {
+        if (*str >= 'a' && *str <= 'z') {
+            *str -= 32;
+        }
     }
+}
+
+void paraMinusculoString(char *destino, const char *origem) {
+    int i = 0;
+    while (origem[i] != '\0') {
+        destino[i] = tolower((unsigned char)origem[i]);
+        i++;
+    }
+    destino[i] = '\0';
+}
+
+void voltarAoMenu() {
+    printf("\nPressione ENTER para continuar...");
+    getchar();
 }
 
 int verificaMatricula(long matricula) {
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (matricula == listaGlobalPessoas.listaDePessoas[i].Matricula) {
-            return 0; // Matrícula já existe
+            return 0; 
         }
     }
-    return 1; // Matrícula disponível
+    return 1; 
 }
 
 int ehCPFValido(const char cpf[]) {
@@ -88,7 +124,8 @@ int ehCPFValido(const char cpf[]) {
     for (int i = 0; cpf[i] != '\0'; i++) {
         if (isdigit((unsigned char)cpf[i])) {
             if (j < 11) {
-                apenasNumeros[j++] = cpf[i];
+                apenasNumeros[j] = cpf[i];
+                j++;
             } else {
                 return 0; 
             }
@@ -96,7 +133,9 @@ int ehCPFValido(const char cpf[]) {
     }
     apenasNumeros[j] = '\0';
 
-    if (j != 11) return 0;
+    if (j != 11) {
+        return 0;
+    }
 
     int todosIguais = 1;
     for (int i = 1; i < 11; i++) {
@@ -105,303 +144,136 @@ int ehCPFValido(const char cpf[]) {
             break;
         }
     }
-    if (todosIguais) return 0;
+    if (todosIguais == 1) {
+        return 0;
+    }
 
     int soma = 0;
     for (int i = 0; i < 9; i++) {
         soma += (apenasNumeros[i] - '0') * (10 - i);
     }
     int resto = soma % 11;
-    int digito1 = (resto < 2) ? 0 : (11 - resto);
+    
+    int digito1;
+    if (resto < 2) {
+        digito1 = 0;
+    } else {
+        digito1 = 11 - resto;
+    }
 
-    if (digito1 != (apenasNumeros[9] - '0')) return 0;
+    if (digito1 != (apenasNumeros[9] - '0')) {
+        return 0;
+    }
 
     soma = 0;
     for (int i = 0; i < 10; i++) {
         soma += (apenasNumeros[i] - '0') * (11 - i);
     }
     resto = soma % 11;
-    int digito2 = (resto < 2) ? 0 : (11 - resto);
+    
+    int digito2;
+    if (resto < 2) {
+        digito2 = 0;
+    } else {
+        digito2 = 11 - resto;
+    }
 
-    if (digito2 != (apenasNumeros[10] - '0')) return 0;
+    if (digito2 != (apenasNumeros[10] - '0')) {
+        return 0;
+    }
 
     return 1; 
 }
 
-// Para cadastros novos
 int verificaCPF(char cpf[]) {
-    if (!ehCPFValido(cpf)) return -1; // CPF com dígitos inválidos ou formato incorreto
+    if (!ehCPFValido(cpf)) {
+        return -1;
+    }
 
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (strcmp(listaGlobalPessoas.listaDePessoas[i].CPF, cpf) == 0) {
-            return 0; // CPF já cadastrado no sistema (aluno ou professor)
+            return 0; 
         }
     }
-    return 1; // CPF válido e liberado para uso
+    return 1; 
 }
 
-// Para atualização de cadastros existentes
 int verificaCPFExcluindoMatricula(char cpf[], long matriculaAtual) {
     if (!ehCPFValido(cpf)) {
-        return -1; // Estrutura/cálculo inválido
+        return -1;
     }
 
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (strcmp(listaGlobalPessoas.listaDePessoas[i].CPF, cpf) == 0 && 
             listaGlobalPessoas.listaDePessoas[i].Matricula != matriculaAtual) {
-            return 0; // CPF pertence a OUTRA pessoa
+            return 0;
         }
     }
-
-    return 1; // Válido (pode ser o mesmo CPF da própria pessoa ou um novo não usado)
+    return 1;
 }
 
 int ehBissexto(int ano) {
-    return (ano % 4 == 0 && ano % 100 != 0) || (ano % 400 == 0);
+    if ((ano % 4 == 0 && ano % 100 != 0) || (ano % 400 == 0)) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 int verificarData(char data[]) {
-    // 1. Verificação do tamanho exato e dos separadores
-    if (strlen(data) != 10) return 0;
-    if (data[2] != '/' || data[5] != '/') return 0;
-
-    // 2. Garantir que todos os caracteres nas posições corretas são dígitos
-    for (int i = 0; i < 10; i++) {
-        if (i == 2 || i == 5) continue;
-        if (!isdigit((unsigned char)data[i])) return 0;
+    if (strlen(data) != 10) {
+        return 0;
+    }
+    if (data[2] != '/' || data[5] != '/') {
+        return 0;
     }
 
-    // 3. Extração numérica de dia, mês e ano
+    for (int i = 0; i < 10; i++) {
+        if (i == 2 || i == 5) {
+            continue;
+        }
+        if (!isdigit((unsigned char)data[i])) {
+            return 0;
+        }
+    }
+
     int dia = (data[0] - '0') * 10 + (data[1] - '0');
     int mes = (data[3] - '0') * 10 + (data[4] - '0');
     int ano = (data[6] - '0') * 1000 + (data[7] - '0') * 100 + 
               (data[8] - '0') * 10 + (data[9] - '0');
 
-    // 4. Validação básica de mês
-    if (mes < 1 || mes > 12) return 0;
+    if (mes < 1 || mes > 12) {
+        return 0;
+    }
 
-    // 5. Quantidade limite de dias por mês
     int diasPorMes[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-    // Ajusta Fevereiro para anos bissextos
     if (mes == 2 && ehBissexto(ano)) {
         diasPorMes[2] = 29;
     }
 
-    // Valida se o dia está no intervalo do mês
-    if (dia < 1 || dia > diasPorMes[mes]) return 0;
-
-    // 6. Validação de ano consciente do calendário atual (sem datas futuras ou anos surreais)
-    time_t t = time(NULL);
-    struct tm tmAtual = *localtime(&t);
-    int anoAtual = tmAtual.tm_year + 1900;
-    int mesAtual = tmAtual.tm_mon + 1;
-    int diaAtual = tmAtual.tm_mday;
-
-    // Limite inferior razoável (ex: pessoa com no máximo ~120 anos)
-    if (ano < 1900) return 0;
-
-    // Se o ano for futuro
-    if (ano > anoAtual) return 0;
-
-    // Se o ano for o atual, verifica se o mês ou dia são futuros
-    if (ano == anoAtual) {
-        if (mes > mesAtual) return 0;
-        if (mes == mesAtual && dia > diaAtual) return 0;
+    if (dia < 1 || dia > diasPorMes[mes]) {
+        return 0;
     }
 
-    return 1; // Data é válida e coerente
-}
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    int anoAtual = tm.tm_year + 1900;
+    int mesAtual = tm.tm_mon + 1;
+    int diaAtual = tm.tm_mday;
 
-// --- MENUS E MÓDULOS ---
-
-void menu(void) {
-    int escolhaMenu = -1, escolhaModulo;
-    char sexo, texto[50];
-    while (escolhaMenu != 0) {
-        printf("\n-----MENU ESCOLA-----\n");
-        printf("1 - Modulo Aluno\n");
-        printf("2 - Modulo Professor\n");
-        printf("3 - Modulo Disciplina\n");
-        printf("4 - Aniversariantes do mes\n");
-        printf("0 - Sair do Menu\n");
-        printf("Digite o numero referente a sua escolha: ");
-        escolhaMenu = lerInteiro();
-        
-        switch (escolhaMenu) {
-            case 1:
-                escolhaModulo = -1;
-                while (escolhaModulo != 0) {
-                    printf("\n-----MODULO ALUNO-----\n");
-                    printf("1 - Cadastrar aluno\n");
-                    printf("2 - Excluir aluno\n");
-                    printf("3 - Atualizar aluno\n");
-                    printf("4 - Listar alunos\n");
-                    printf("5 - Listar alunos por sexo\n");
-                    printf("6 - Listar alunos por ordem alfabetica\n");
-                    printf("7 - Listar alunos por data de nascimento\n");
-                    printf("8 - Lista de alunos matriculados em menos de 3 disciplinas\n");
-                    printf("9 - Buscar alunos por texto\n");
-                    printf("0 - Sair do Módulo Aluno\n");
-                    printf("Digite o numero referente a sua escolha: ");
-                    escolhaModulo = lerInteiro(); 
-
-                    switch (escolhaModulo) {
-                        case 1:
-                            cadastrarPessoa('A');
-                            break;
-                        case 2:
-                            excluirPessoa('A');
-                            break;
-                        case 3:
-                            atualizarPessoa('A');
-                            break;
-                        case 4:
-                            listarPessoas('A');
-                            break;
-                        case 5:
-                            printf("Digite o sexo (M - Masculino | F - Feminino): ");
-                            scanf(" %c", &sexo);
-                            limparBuffer();
-                            paraMaiuscula(&sexo);
-                            listarPessoasPorSexo(sexo, 'A');
-                            break;
-                        case 6:
-                            listarPessoasPorNome('A');
-                            break;
-                        case 7:
-                            listarPessoasPorIdade('A');
-                            break;
-                        case 8:
-                            listarMenosDe3Disciplinas();
-                            break;
-                        case 9:
-                            printf("Digite um texto para buscar alunos: ");
-                            fgets(texto, sizeof(texto), stdin);
-                            texto[strcspn(texto, "\n")] = '\0';
-                            listarPessoasPorString('A', texto);         
-                            break;
-                        case 0:
-                            printf("Saindo do Modulo Aluno...\n");
-                            break;
-                        default:
-                            printf("Esta opção não existe, digite um número válido.\n");
-                            break;
-                    }
-                }
-                break;
-                
-            case 2:
-                escolhaModulo = -1;
-                while (escolhaModulo != 0) {
-                    printf("\n-----MODULO PROFESSOR-----\n");
-                    printf("1 - Cadastrar professor\n");
-                    printf("2 - Excluir professor\n");
-                    printf("3 - Atualizar professor\n");
-                    printf("4 - Listar professores\n");
-                    printf("5 - Listar professores por sexo\n");
-                    printf("6 - Listar professores por ordem alfabetica\n");
-                    printf("7 - Listar professores por data de nascimento\n");
-                    printf("8 - Buscar professores por texto\n");
-                    printf("0 - Sair do Módulo Professor\n");
-                    printf("Digite o numero referente a sua escolha: ");
-                    escolhaModulo = lerInteiro();               
-                    
-                    switch (escolhaModulo) {
-                        case 1:
-                            cadastrarPessoa('P');
-                            break;
-                        case 2:
-                            excluirPessoa('P');
-                            break;
-                        case 3:
-                            atualizarPessoa('P');
-                            break;
-                        case 4:
-                            listarPessoas('P');
-                            break;
-                        case 5:                         
-                            printf("Digite o sexo (M - Masculino | F - Feminino): ");
-                            scanf(" %c", &sexo);
-                            limparBuffer();
-                            paraMaiuscula(&sexo);
-                            listarPessoasPorSexo(sexo, 'P');
-                            break;
-                        case 6:
-                            listarPessoasPorNome('P');
-                            break;
-                        case 7:
-                            listarPessoasPorIdade('P'); 
-                            break;
-                        case 8:
-                            printf("Digite um texto para buscar professores: ");
-                            fgets(texto, sizeof(texto), stdin);
-                            texto[strcspn(texto, "\n")] = '\0';
-                            listarPessoasPorString('P', texto);
-                            break;
-                        case 0:
-                            printf("Saindo do Modulo Professor...\n");
-                            break;
-                        default:
-                            printf("Esta opção não existe, digite um número válido.\n");
-                            break;
-                    }
-                }
-                break;
-                
-            case 3:
-                escolhaModulo = -1;
-                while (escolhaModulo != 0) {
-                    printf("\n-----MODULO DISCIPLINAS-----\n");
-                    printf("1 - Cadastrar disciplina\n");
-                    printf("2 - Listar todas as disciplinas\n");
-                    printf("3 - Listar disciplinas que passam de 40 alunos matriculados\n");
-                    printf("4 - Inserir aluno em uma disciplina\n");
-                    printf("0 - Sair do Modulo Disciplinas\n");
-                    printf("Digite o numero referente a sua escolha: ");
-                    escolhaModulo = lerInteiro();
-                    
-                    switch (escolhaModulo) {
-                        case 1:
-                            cadastrarDisciplina();
-                            break;
-                        case 2:
-                            listarDisciplinas();
-                            voltarAoMenu();
-                            break;
-                        case 3:
-                            listarDisciplinasComMaisDe40Vagas();
-                            break;
-                        case 4:
-                            inserirAlunoNaDisciplina();
-                            break;
-                        case 0:
-                            printf("Saindo do Módulo Disciplinas...\n");
-                            break;
-                        default:
-                            printf("Esta opção não existe, digite um número válido.\n");
-                            break;
-                    }
-                }
-                break;
-
-            case 4:
-                listaAniversariantesDoMes();
-                break;
-
-            case 0:
-                printf("Saindo do menu... Programa encerrado.\n");
-                break;
-            default:
-                printf("Esta opção não existe, digite um número válido.\n");
-                break;
+    if (ano < 1900 || ano > anoAtual) {
+        return 0;
+    }
+    if (ano == anoAtual) {
+        if (mes > mesAtual) {
+            return 0;
+        }
+        if (mes == mesAtual && dia > diaAtual) {
+            return 0;
         }
     }
-}
 
-void voltarAoMenu(void) {
-    printf("\nPressione ENTER para continuar...");
-    getchar();
+    return 1;
 }
 
 void cadastrarPessoa(char tipo) {
@@ -423,7 +295,7 @@ void cadastrarPessoa(char tipo) {
     }
 
     printf("Digite o CPF a ser cadastrado: ");
-    scanf("%14s", pessoa.CPF);
+    scanf("%11s", pessoa.CPF);
     limparBuffer();
 
     validador = verificaCPF(pessoa.CPF);
@@ -433,7 +305,7 @@ void cadastrarPessoa(char tipo) {
         } else if (validador == 0) {
             printf("Este CPF ja esta cadastrado no sistema, digite outro CPF: ");
         }
-        scanf("%14s", pessoa.CPF);
+        scanf("%11s", pessoa.CPF);
         limparBuffer();
         validador = verificaCPF(pessoa.CPF);
     }
@@ -468,7 +340,12 @@ void cadastrarPessoa(char tipo) {
     indiceListaPessoas++;
     listaGlobalPessoas.quantidadeTotal = indiceListaPessoas;
 
-    printf("%s %s cadastrado(a) com sucesso!\n", (tipo == 'A' ? "Aluno" : "Professor"), pessoa.Nome);
+    if (tipo == 'A') {
+        printf("Aluno %s cadastrado(a) com sucesso!\n", pessoa.Nome);
+    } else {
+        printf("Professor %s cadastrado(a) com sucesso!\n", pessoa.Nome);
+    }
+    
     voltarAoMenu();
 }
 
@@ -481,7 +358,11 @@ void excluirPessoa(char tipo) {
         }
     }
     if (!validador) {
-        printf("Não há %s cadastrados no momento.\n", (tipo == 'A' ? "alunos" : "professores"));
+        if (tipo == 'A') {
+            printf("Não há alunos cadastrados no momento.\n");
+        } else {
+            printf("Não há professores cadastrados no momento.\n");
+        }
         voltarAoMenu();
         return;
     }
@@ -496,24 +377,45 @@ void excluirPessoa(char tipo) {
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (matricula == listaGlobalPessoas.listaDePessoas[i].Matricula && tipo == listaGlobalPessoas.listaDePessoas[i].Tipo) {
             strcpy(nomePessoa, listaGlobalPessoas.listaDePessoas[i].Nome);
+
+            if (tipo == 'A') {
+                for (int d = 0; d < indiceListaDisciplinas; d++) {
+                    for (int m = 0; m < listaDisciplinas[d].indiceAlunosMatriculados; m++) {
+                        if (listaDisciplinas[d].AlunosMatriculados[m].Matricula == matricula) {
+                            for (int k = m; k < listaDisciplinas[d].indiceAlunosMatriculados - 1; k++) {
+                                listaDisciplinas[d].AlunosMatriculados[k] = listaDisciplinas[d].AlunosMatriculados[k + 1];
+                            }
+                            listaDisciplinas[d].indiceAlunosMatriculados--;
+                            break;
+                        }
+                    }
+                }
+            }
+
             for (int j = i; j < indiceListaPessoas - 1; j++) {
                 listaGlobalPessoas.listaDePessoas[j] = listaGlobalPessoas.listaDePessoas[j + 1];
             }
             indiceListaPessoas--;
             listaGlobalPessoas.quantidadeTotal = indiceListaPessoas;
             
-            printf("\n%s %s excluido(a) com sucesso.\n", (tipo == 'A' ? "Aluno" : "Professor"), nomePessoa);
-            break;
+            if (tipo == 'A') {
+                printf("\nAluno %s excluido(a) com sucesso.\n", nomePessoa);
+            } else {
+                printf("\nProfessor %s excluido(a) com sucesso.\n", nomePessoa);
+            }
+            
+            voltarAoMenu();
+            return;
         }
     }
+    printf("Matrícula não encontrada.\n");
+    voltarAoMenu();
 }
 
 void atualizarPessoa(char tipo) {
     long matricula;
-    int validador = 0;
-    int indiceEncontrado = -1;
+    int validador = 0, indiceEncontrado = -1;
 
-    // 1. Verifica se existem pessoas do tipo solicitado
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
             validador = 1;
@@ -522,18 +424,20 @@ void atualizarPessoa(char tipo) {
     }
 
     if (!validador) {
-        printf("Não há %s cadastrados no momento.\n", (tipo == 'A' ? "alunos" : "professores"));
+        if (tipo == 'A') {
+            printf("Não há alunos cadastrados no momento.\n");
+        } else {
+            printf("Não há professores cadastrados no momento.\n");
+        }
         voltarAoMenu();
         return;
     }
 
-    // 2. Exibe os cadastros atuais e solicita a matrícula
     listarPessoas(tipo);
     printf("\nDigite a matricula de quem voce deseja atualizar: ");
     scanf("%ld", &matricula);
     limparBuffer();
 
-    // 3. Procura o índice correspondente
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Matricula == matricula && 
             listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
@@ -548,17 +452,14 @@ void atualizarPessoa(char tipo) {
         return;
     }
 
-    // Usamos uma variável auxiliar temporária para evitar corromper o registro caso o usuário digite algo errado
     Pessoa temp = listaGlobalPessoas.listaDePessoas[indiceEncontrado];
 
-    // --- LEITURA DO NOVO NOME ---
     printf("Digite o novo nome: ");
     fgets(temp.Nome, sizeof(temp.Nome), stdin);
     temp.Nome[strcspn(temp.Nome, "\n")] = '\0';
     
-    // --- LEITURA DO NOVO CPF ---
     printf("Digite o novo CPF: ");
-    scanf("%14s", temp.CPF);
+    scanf("%11s", temp.CPF);
     limparBuffer();
 
     validador = verificaCPFExcluindoMatricula(temp.CPF, temp.Matricula);
@@ -568,12 +469,11 @@ void atualizarPessoa(char tipo) {
         } else if (validador == 0) {
             printf("Este CPF ja esta cadastrado para outra pessoa, digite outro CPF: ");
         }
-        scanf("%14s", temp.CPF);
+        scanf("%11s", temp.CPF);
         limparBuffer();
         validador = verificaCPFExcluindoMatricula(temp.CPF, temp.Matricula);
     }
 
-    // --- LEITURA DO SEXO ---
     printf("Digite o novo sexo (M/F): ");
     scanf(" %c", &temp.Sexo);
     limparBuffer();
@@ -585,7 +485,6 @@ void atualizarPessoa(char tipo) {
         paraMaiuscula(&temp.Sexo);
     }
 
-    // --- LEITURA DA DATA DE NASCIMENTO ---
     printf("Digite a nova data de nascimento (dd/mm/aaaa): ");
     fgets(temp.DataNascimento, sizeof(temp.DataNascimento), stdin);
     temp.DataNascimento[strcspn(temp.DataNascimento, "\n")] = '\0';
@@ -598,11 +497,6 @@ void atualizarPessoa(char tipo) {
         validador = verificarData(temp.DataNascimento);
     }
 
-    // Preserva intactos o Tipo, a Matrícula original e as matérias matriculadas
-    temp.Tipo = tipo;
-    temp.Matricula = matricula;
-
-    // Aplica as alterações no registro global com segurança
     listaGlobalPessoas.listaDePessoas[indiceEncontrado] = temp;
 
     printf("\nDados atualizados com sucesso.\n");
@@ -619,10 +513,15 @@ void listarPessoas(char tipo) {
     }
 
     if (validador) {
-        printf("\n=== LISTA DE %s ===\n", (tipo == 'A' || tipo == 'a') ? "ALUNOS" : "PROFESSORES");
+        if (tipo == 'A' || tipo == 'a') {
+            printf("\n=== LISTA DE ALUNOS ===\n");
+        } else {
+            printf("\n=== LISTA DE PROFESSORES ===\n");
+        }
+
         for (int i = 0; i < indiceListaPessoas; i++) {
             if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
-                printf("Nome: %-20s | Matricula: %-8ld | CPF: %-11s | Sexo: %c | DataNasc: %s\n",
+                printf("Nome: %-20s | Matricula: %-8ld | CPF: %s | Sexo: %c | DataNasc: %s\n",
                    listaGlobalPessoas.listaDePessoas[i].Nome, 
                    listaGlobalPessoas.listaDePessoas[i].Matricula, 
                    listaGlobalPessoas.listaDePessoas[i].CPF,
@@ -631,7 +530,11 @@ void listarPessoas(char tipo) {
             }
         }
     } else {
-        printf("\nNão há %s cadastrados no momento.\n", (tipo == 'A' ? "alunos" : "professores"));
+        if (tipo == 'A') {
+            printf("\nNão há alunos cadastrados no momento.\n");
+        } else {
+            printf("\nNão há professores cadastrados no momento.\n");
+        }
     }
 }
 
@@ -666,7 +569,6 @@ int compararNomesSeguro(char s1[], char s2[]) {
     while (s1[i] != '\0' && s2[i] != '\0') {
         char c1 = tolower((unsigned char)s1[i]);
         char c2 = tolower((unsigned char)s2[i]);
-
         if (c1 != c2) {
             return c1 - c2;
         }
@@ -718,80 +620,22 @@ void listarPessoasPorNome(char tipo) {
     voltarAoMenu();
 }
 
-int compararIdade(char d1[], char d2[]){
+int compararIdade(char d1[], char d2[]) {
     int ano1 = ((d1[6]-'0')*1000 + (d1[7]-'0')*100 + (d1[8]-'0')*10 + (d1[9]-'0')); 
     int ano2 = ((d2[6]-'0')*1000 + (d2[7]-'0')*100 + (d2[8]-'0')*10 + (d2[9]-'0'));
-    if (ano1 != ano2) return ano1 - ano2;
+    if (ano1 != ano2) {
+        return ano1 - ano2;
+    }
 
     int mes1 = ((d1[3]-'0')*10 + (d1[4]-'0')); 
     int mes2 = ((d2[3]-'0')*10 + (d2[4]-'0')); 
-    if (mes1 != mes2) return mes1 - mes2;
+    if (mes1 != mes2) {
+        return mes1 - mes2;
+    }
 
     int dia1 = ((d1[0]-'0')*10 + (d1[1]-'0')); 
     int dia2 = ((d2[0]-'0')*10 + (d2[1]-'0'));
     return dia1 - dia2; 
-}
-
-void listaAniversariantesDoMes(void) {
-    time_t t = time(NULL);           
-    struct tm tm = *localtime(&t);   
-    int mesAtual = tm.tm_mon + 1; 
-
-    if (indiceListaPessoas == 0) {
-        printf("\nNao ha pessoas cadastradas no momento.\n");
-        voltarAoMenu();
-        return;
-    }
-
-    Pessoa alunosAniversariantes[indiceListaPessoas];  
-    Pessoa professoresAniversariantes[indiceListaPessoas];  
-    int qtdAlunos = 0, qtdProfessores = 0;
-
-    printf("\n=== LISTA ANIVERSARIANTES DESTE MES (%d) ===\n", mesAtual);
-    
-    for (int i = 0; i < indiceListaPessoas; i++) {
-        int mesNascimento = ((listaGlobalPessoas.listaDePessoas[i].DataNascimento[3] - '0') * 10) + 
-                            (listaGlobalPessoas.listaDePessoas[i].DataNascimento[4] - '0');
-
-        if (mesAtual == mesNascimento) {
-            if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A') {
-                alunosAniversariantes[qtdAlunos++] = listaGlobalPessoas.listaDePessoas[i];
-            } else if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'P') {
-                professoresAniversariantes[qtdProfessores++] = listaGlobalPessoas.listaDePessoas[i];
-            }
-        }
-    }
-
-    if (qtdAlunos == 0 && qtdProfessores == 0) {
-        printf("Nenhum aniversariante no mes.\n");
-        voltarAoMenu();
-        return;
-    }
-
-    printf("\n--- ALUNOS ---\n");
-    if (qtdAlunos == 0) {
-        printf("Nenhum aluno aniversariante este mes.\n");
-    } else {
-        for (int i = 0; i < qtdAlunos; i++) {
-            printf("Nome: %-20s | Aniversario: %s | Matricula: %ld\n",
-                   alunosAniversariantes[i].Nome,
-                   alunosAniversariantes[i].DataNascimento,
-                   alunosAniversariantes[i].Matricula);
-        }
-    }
-
-    printf("\n--- PROFESSORES ---\n");
-    if (qtdProfessores == 0) {
-        printf("Nenhum professor aniversariante este mes.\n");
-    } else {
-        for (int i = 0; i < qtdProfessores; i++) {
-            printf("Nome: %-20s | Aniversario: %s | Matricula: %ld\n",
-                   professoresAniversariantes[i].Nome,
-                   professoresAniversariantes[i].DataNascimento,
-                   professoresAniversariantes[i].Matricula);
-        }
-    }
-    voltarAoMenu();    
 }
 
 void listarPessoasPorIdade(char tipo) {
@@ -805,7 +649,8 @@ void listarPessoasPorIdade(char tipo) {
 
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
-            IdadesOrdenadas[qtd++] = listaGlobalPessoas.listaDePessoas[i];
+            IdadesOrdenadas[qtd] = listaGlobalPessoas.listaDePessoas[i];
+            qtd++;
         }
     }
 
@@ -847,19 +692,28 @@ void listarPessoasPorString(char tipo, char string[]) {
     }
 
     if (!validador) {
-        printf("Não há %s cadastrados no momento.\n", (tipo == 'A' ? "alunos" : "professores"));
+        if (tipo == 'A') {
+            printf("Não há alunos cadastrados no momento.\n");
+        } else {
+            printf("Não há professores cadastrados no momento.\n");
+        }
         voltarAoMenu();
         return;
     }
+
+    char buscaLower[50], nomeLower[50];
+    paraMinusculoString(buscaLower, string);
 
     int contadorPrints = 0;
 
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == tipo) {
-            if (strstr(listaGlobalPessoas.listaDePessoas[i].Nome, string) != NULL) {
-                printf("Nome: %s | Matricula: %ld\n", 
+            paraMinusculoString(nomeLower, listaGlobalPessoas.listaDePessoas[i].Nome);
+            if (strstr(nomeLower, buscaLower) != NULL) {
+                printf("Nome: %-20s | Matricula: %-8ld | CPF: %s\n", 
                        listaGlobalPessoas.listaDePessoas[i].Nome,
-                       listaGlobalPessoas.listaDePessoas[i].Matricula);
+                       listaGlobalPessoas.listaDePessoas[i].Matricula,
+                       listaGlobalPessoas.listaDePessoas[i].CPF);
                 contadorPrints++;
             }
         }
@@ -872,7 +726,63 @@ void listarPessoasPorString(char tipo, char string[]) {
     voltarAoMenu();
 }
 
-void listarDisciplinas(void) {
+void listaAniversariantesDoMes() {
+    time_t t = time(NULL);           
+    struct tm tm = *localtime(&t);   
+    int mesAtual = tm.tm_mon + 1; 
+
+    if (indiceListaPessoas == 0) {
+        printf("\nNao ha pessoas cadastradas no momento.\n");
+        voltarAoMenu();
+        return;
+    }
+
+    Pessoa alunosAniversariantes[indiceListaPessoas];  
+    Pessoa professoresAniversariantes[indiceListaPessoas];  
+    int qtdAlunos = 0, qtdProfessores = 0;
+
+    printf("\n=== LISTA ANIVERSARIANTES DESTE MES (%d) ===\n", mesAtual);
+    
+    for (int i = 0; i < indiceListaPessoas; i++) {
+        int mesNascimento = ((listaGlobalPessoas.listaDePessoas[i].DataNascimento[3] - '0') * 10) + 
+                            (listaGlobalPessoas.listaDePessoas[i].DataNascimento[4] - '0');
+
+        if (mesAtual == mesNascimento) {
+            if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A') {
+                alunosAniversariantes[qtdAlunos] = listaGlobalPessoas.listaDePessoas[i];
+                qtdAlunos++;
+            } else if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'P') {
+                professoresAniversariantes[qtdProfessores] = listaGlobalPessoas.listaDePessoas[i];
+                qtdProfessores++;
+            }
+        }
+    }
+
+    if (qtdAlunos == 0 && qtdProfessores == 0) {
+        printf("Nenhum aniversariante no mes.\n");
+        voltarAoMenu();
+        return;
+    }
+
+    printf("\n--- ALUNOS ---\n");
+    for (int i = 0; i < qtdAlunos; i++) {
+        printf("Nome: %-20s | Aniversario: %s | Matricula: %ld\n",
+               alunosAniversariantes[i].Nome,
+               alunosAniversariantes[i].DataNascimento,
+               alunosAniversariantes[i].Matricula);
+    }
+
+    printf("\n--- PROFESSORES ---\n");
+    for (int i = 0; i < qtdProfessores; i++) {
+        printf("Nome: %-20s | Aniversario: %s | Matricula: %ld\n",
+               professoresAniversariantes[i].Nome,
+               professoresAniversariantes[i].DataNascimento,
+               professoresAniversariantes[i].Matricula);
+    }
+    voltarAoMenu();    
+}
+
+void listarDisciplinas() {
     if (indiceListaDisciplinas == 0) {
         printf("\nNenhuma disciplina cadastrada.\n");
         return;
@@ -889,25 +799,10 @@ void listarDisciplinas(void) {
     }
 }
 
-void listarDisciplinaEspecifica(char disciplina[]) {
-    for (int i = 0; i < indiceListaDisciplinas; i++) {
-        if (strcmp(listaDisciplinas[i].NomeDisciplina, disciplina) == 0) {
-            printf("Nome: %s | Codigo: %ld | Semestre: %d | Professor: %s\n",
-                listaDisciplinas[i].NomeDisciplina,
-                listaDisciplinas[i].CodigoDisciplina,
-                listaDisciplinas[i].SemestreDisciplina,
-                listaDisciplinas[i].ProfessorDisciplina.Nome);
-            return;
-        }
-    }
-    printf("Disciplina não encontrada.\n");
-    voltarAoMenu();
-}
-
 int verificarProfessordisciplina(char professor[]) {
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'P') {
-            if (strcmp(listaGlobalPessoas.listaDePessoas[i].Nome, professor) == 0) {
+            if (comparaStringsInsensivel(professor, listaGlobalPessoas.listaDePessoas[i].Nome) == 0) {
                 return 1;
             }
         }
@@ -915,7 +810,7 @@ int verificarProfessordisciplina(char professor[]) {
     return 0;
 }
 
-void cadastrarDisciplina(void) {
+void cadastrarDisciplina() {
     int validador = 0;
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'P') {
@@ -926,24 +821,26 @@ void cadastrarDisciplina(void) {
 
     if (validador) {
         Disciplina disciplina;
-        memset(&disciplina, 0, sizeof(Disciplina));
 
         printf("Digite o nome da disciplina: ");
         fgets(disciplina.NomeDisciplina, sizeof(disciplina.NomeDisciplina), stdin);
         disciplina.NomeDisciplina[strcspn(disciplina.NomeDisciplina, "\n")] = '\0';
 
         printf("Digite o codigo da disciplina: ");
-        scanf("%ld", &disciplina.CodigoDisciplina);
+        disciplina.CodigoDisciplina = lerInteiro();
 
-        printf("Digite o semestre da disciplina: ");
-        scanf("%d", &disciplina.SemestreDisciplina);
+        while (verificaCodigoDisciplina(disciplina.CodigoDisciplina) == 0) {
+            printf("Este codigo ja esta cadastrado em outra disciplina! Digite outro codigo: ");
+            disciplina.CodigoDisciplina = lerInteiro();
+        }
+
+        printf("Digite o semestre da disciplina (1 ou 2): ");
+        disciplina.SemestreDisciplina = lerInteiro();
 
         while (disciplina.SemestreDisciplina != 1 && disciplina.SemestreDisciplina != 2) {
             printf("Digite apenas 1 (Primeiro semestre) ou 2 (Segundo semestre): ");
-            scanf("%d", &disciplina.SemestreDisciplina);
+            disciplina.SemestreDisciplina = lerInteiro();
         }
-
-        limparBuffer();
 
         printf("\nLista de professores cadastrados:\n");
         listarPessoas('P');
@@ -953,7 +850,7 @@ void cadastrarDisciplina(void) {
         disciplina.ProfessorDisciplina.Nome[strcspn(disciplina.ProfessorDisciplina.Nome, "\n")] = '\0';
 
         while (verificarProfessordisciplina(disciplina.ProfessorDisciplina.Nome) == 0) {
-            printf("Professor não encontrado, Digite um professor válido: ");
+            printf("Professor não encontrado! Digite um professor válido: ");
             fgets(disciplina.ProfessorDisciplina.Nome, sizeof(disciplina.ProfessorDisciplina.Nome), stdin);
             disciplina.ProfessorDisciplina.Nome[strcspn(disciplina.ProfessorDisciplina.Nome, "\n")] = '\0';
         }
@@ -962,12 +859,13 @@ void cadastrarDisciplina(void) {
         listaDisciplinas[indiceListaDisciplinas] = disciplina;
         indiceListaDisciplinas++;
         
-        printf("Disciplina %s cadastrada com sucesso!\n", disciplina.NomeDisciplina);
+        printf("\nDisciplina %s cadastrada com sucesso!\n", disciplina.NomeDisciplina);
     } else {
         printf("É preciso cadastrar professores antes de cadastrar uma disciplina.\n");
     }
     voltarAoMenu();
 }
+
 void inserirAlunoNaDisciplina() {
     if (indiceListaDisciplinas <= 0) {
         printf("Não existem disciplinas cadastradas.\n");
@@ -991,7 +889,7 @@ void inserirAlunoNaDisciplina() {
         nome[strcspn(nome, "\n")] = '\0';
 
         for (int i = 0; i < indiceListaDisciplinas; i++) {
-            if (strcmp(listaDisciplinas[i].NomeDisciplina, nome) == 0) {
+            if (comparaStringsInsensivel(listaDisciplinas[i].NomeDisciplina, nome) == 0) {
                 idxDisciplina = i;
                 break;
             }
@@ -1008,7 +906,6 @@ void inserirAlunoNaDisciplina() {
     listarPessoas('A');
 
     while (opcao != 0) {
-        // --- ADICIONADO: Conta quantos alunos EXISTEM no total ---
         int totalAlunosCadastrados = 0;
         for (int i = 0; i < indiceListaPessoas; i++) {
             if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A') {
@@ -1016,7 +913,6 @@ void inserirAlunoNaDisciplina() {
             }
         }
 
-        // --- ADICIONADO: Se todos os alunos já estiverem na disciplina, encerra o loop ---
         if (listaDisciplinas[idxDisciplina].indiceAlunosMatriculados >= totalAlunosCadastrados) {
             printf("\nTodos os alunos cadastrados no sistema ja foram inseridos nesta disciplina!\n");
             break;
@@ -1029,7 +925,7 @@ void inserirAlunoNaDisciplina() {
         validaAluno = 0;
         for (int i = 0; i < indiceListaPessoas; i++) {
             if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A') {
-                if (strcmp(listaGlobalPessoas.listaDePessoas[i].Nome, nome) == 0) {
+                if (comparaStringsInsensivel(listaGlobalPessoas.listaDePessoas[i].Nome, nome) == 0) {
                     validaAluno = 1;
                     int idxMat = listaDisciplinas[idxDisciplina].indiceAlunosMatriculados;
                     
@@ -1041,7 +937,7 @@ void inserirAlunoNaDisciplina() {
                         }
                     }
 
-                    if (jaMatriculado) {
+                    if (jaMatriculado == 1) {
                         printf("Aluno %s já se encontra matriculado nesta disciplina.\n", nome);
                     } else {
                         listaDisciplinas[idxDisciplina].AlunosMatriculados[idxMat] = listaGlobalPessoas.listaDePessoas[i];
@@ -1054,9 +950,7 @@ void inserirAlunoNaDisciplina() {
             }
         } 
 
-        // Perguntar se deseja continuar apenas se houver mais alunos disponíveis
         if (validaAluno == 1) {
-            // Se após a inserção atingiu o limite de alunos cadastrados, encerra
             if (listaDisciplinas[idxDisciplina].indiceAlunosMatriculados >= totalAlunosCadastrados) {
                 printf("\nTodos os alunos cadastrados no sistema ja foram inseridos nesta disciplina!\n");
                 break;
@@ -1065,19 +959,23 @@ void inserirAlunoNaDisciplina() {
             printf("Deseja inserir outro aluno nesta disciplina? (1 - Sim | 0 - Não): ");
             scanf("%d", &opcao);
             limparBuffer();
-            if (opcao == 0) break;
+            if (opcao == 0) {
+                break;
+            }
         } else {
             printf("Aluno não encontrado na base de cadastros.\n");
             printf("Deseja tentar outro aluno? (1 - Sim | 0 - Não): ");
             scanf("%d", &opcao);
             limparBuffer();
-            if (opcao == 0) break;
+            if (opcao == 0) {
+                break;
+            }
         }
     }
     voltarAoMenu();
 }
 
-void listarDisciplinasComMaisDe40Vagas(void) {
+void listarDisciplinasComMaisDe40Vagas() {
     if (indiceListaDisciplinas > 0) {
         int cont = 0;
         for (int i = 0; i < indiceListaDisciplinas; i++) {
@@ -1099,9 +997,8 @@ void listarDisciplinasComMaisDe40Vagas(void) {
     voltarAoMenu();
 }
 
-void listarMenosDe3Disciplinas(void) {
-    int possuiAlunos = 0;
-    int alunosEncontrados = 0;
+void listarMenosDe3Disciplinas() {
+    int possuiAlunos = 0, alunosEncontrados = 0;
     
     for (int i = 0; i < indiceListaPessoas; i++) {
         if (listaGlobalPessoas.listaDePessoas[i].Tipo == 'A') {
@@ -1131,4 +1028,133 @@ void listarMenosDe3Disciplinas(void) {
     voltarAoMenu();
 }
 
-#endif 
+void menu() {
+    int escolhaMenu = -1, escolhaModulo;
+    char sexo, texto[50];
+    while (escolhaMenu != 0) {
+        printf("\n-----MENU ESCOLA-----\n");
+        printf("1 - Modulo Aluno\n");
+        printf("2 - Modulo Professor\n");
+        printf("3 - Modulo Disciplina\n");
+        printf("4 - Aniversariantes do mes\n");
+        printf("0 - Sair do Menu\n");
+        printf("Digite o numero referente a sua escolha: ");
+        escolhaMenu = lerInteiro();
+        
+        switch (escolhaMenu) {
+            case 1:
+                escolhaModulo = -1;
+                while (escolhaModulo != 0) {
+                    printf("\n-----MODULO ALUNO-----\n");
+                    printf("1 - Cadastrar aluno\n");
+                    printf("2 - Excluir aluno\n");
+                    printf("3 - Atualizar aluno\n");
+                    printf("4 - Listar alunos\n");
+                    printf("5 - Listar alunos por sexo\n");
+                    printf("6 - Listar alunos por ordem alfabetica\n");
+                    printf("7 - Listar alunos por data de nascimento\n");
+                    printf("8 - Lista de alunos matriculados em menos de 3 disciplinas\n");
+                    printf("9 - Buscar alunos por texto\n");
+                    printf("0 - Sair do Módulo Aluno\n");
+                    printf("Digite o numero referente a sua escolha: ");
+                    escolhaModulo = lerInteiro(); 
+
+                    switch (escolhaModulo) {
+                        case 1: cadastrarPessoa('A'); break;
+                        case 2: excluirPessoa('A'); break;
+                        case 3: atualizarPessoa('A'); break;
+                        case 4: listarPessoas('A'); voltarAoMenu(); break;
+                        case 5:
+                            printf("Digite o sexo (M - Masculino | F - Feminino): ");
+                            scanf(" %c", &sexo);
+                            limparBuffer();
+                            paraMaiuscula(&sexo);
+                            listarPessoasPorSexo(sexo, 'A');
+                            break;
+                        case 6: listarPessoasPorNome('A'); break;
+                        case 7: listarPessoasPorIdade('A'); break;
+                        case 8: listarMenosDe3Disciplinas(); break;
+                        case 9:
+                            printf("Digite um texto para buscar alunos: ");
+                            fgets(texto, sizeof(texto), stdin);
+                            texto[strcspn(texto, "\n")] = '\0';
+                            listarPessoasPorString('A', texto);         
+                            break;
+                        case 0: printf("Saindo do Modulo Aluno...\n"); break;
+                        default: printf("Esta opção não existe, digite um número válido.\n"); break;
+                    }
+                }
+                break;
+                
+            case 2:
+                escolhaModulo = -1;
+                while (escolhaModulo != 0) {
+                    printf("\n-----MODULO PROFESSOR-----\n");
+                    printf("1 - Cadastrar professor\n");
+                    printf("2 - Excluir professor\n");
+                    printf("3 - Atualizar professor\n");
+                    printf("4 - Listar professores\n");
+                    printf("5 - Listar professores por sexo\n");
+                    printf("6 - Listar professores por ordem alfabetica\n");
+                    printf("7 - Listar professores por data de nascimento\n");
+                    printf("8 - Buscar professores por texto\n");
+                    printf("0 - Sair do Módulo Professor\n");
+                    printf("Digite o numero referente a sua escolha: ");
+                    escolhaModulo = lerInteiro();               
+                    
+                    switch (escolhaModulo) {
+                        case 1: cadastrarPessoa('P'); break;
+                        case 2: excluirPessoa('P'); break;
+                        case 3: atualizarPessoa('P'); break;
+                        case 4: listarPessoas('P'); voltarAoMenu(); break;
+                        case 5:                         
+                            printf("Digite o sexo (M - Masculino | F - Feminino): ");
+                            scanf(" %c", &sexo);
+                            limparBuffer();
+                            paraMaiuscula(&sexo);
+                            listarPessoasPorSexo(sexo, 'P');
+                            break;
+                        case 6: listarPessoasPorNome('P'); break;
+                        case 7: listarPessoasPorIdade('P'); break;
+                        case 8:
+                            printf("Digite um texto para buscar professores: ");
+                            fgets(texto, sizeof(texto), stdin);
+                            texto[strcspn(texto, "\n")] = '\0';
+                            listarPessoasPorString('P', texto);
+                            break;
+                        case 0: printf("Saindo do Modulo Professor...\n"); break;
+                        default: printf("Esta opção não existe, digite um número válido.\n"); break;
+                    }
+                }
+                break;
+                
+            case 3:
+                escolhaModulo = -1;
+                while (escolhaModulo != 0) {
+                    printf("\n-----MODULO DISCIPLINAS-----\n");
+                    printf("1 - Cadastrar disciplina\n");
+                    printf("2 - Listar todas as disciplinas\n");
+                    printf("3 - Listar disciplinas que passam de 40 alunos matriculados\n");
+                    printf("4 - Inserir aluno em uma disciplina\n");
+                    printf("0 - Sair do Modulo Disciplinas\n");
+                    printf("Digite o numero referente a sua escolha: ");
+                    escolhaModulo = lerInteiro();
+                    
+                    switch (escolhaModulo) {
+                        case 1: cadastrarDisciplina(); break;
+                        case 2: listarDisciplinas(); voltarAoMenu(); break;
+                        case 3: listarDisciplinasComMaisDe40Vagas(); break;
+                        case 4: inserirAlunoNaDisciplina(); break;
+                        case 0: printf("Saindo do Módulo Disciplinas...\n"); break;
+                        default: printf("Esta opção não existe, digite um número válido.\n"); break;
+                    }
+                }
+                break;
+
+            case 4: listaAniversariantesDoMes(); break;
+            case 0: printf("Saindo do menu... Programa encerrado.\n"); break;
+            default: printf("Esta opção não existe, digite um número válido.\n"); break;
+        }
+    }
+}
+
