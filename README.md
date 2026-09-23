@@ -19,3 +19,5 @@ Abra o terminal do seu computador (ou o terminal integrado do VS Code) e rode:
 
 ```bash
 git clone [https://github.com/JoaoLupoxDev/Projeto-Escola-INF029.git](https://github.com/JoaoLupoxDev/Projeto-Escola-INF029.git)
+
+Para executar o projeto, abra o ficheiro main.c no VS Code e clique no botão de Run (ou pressione F5 / Ctrl + F5) para compilar e rodar o código.
